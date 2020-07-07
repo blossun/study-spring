@@ -638,7 +638,68 @@ xml에서 component scanning을 했던 것처럼 자바코드로도 스캐닝을
 
 
 
-### 4. 
+### 4. ComponentScan 어노테이션을 이용한 빈 설정
+
+```java
+@ComponentScan(basePackageClasses = SpringapplicationcontextApplication.class)
+```
+
+* basePackages = "path/of/package/class"
+
+  문자열로 입력할 수 있다. (IDE가 좋으면 자동완성을 지원하긴 하지만 Type Safety[^2]하지 않다.)
+
+* basePackageClasses = 클래스명
+
+  **좀 더 Type Safety한 방법**
+
+  이 어플리케이션(클래스)이 위치한 곳부터 Component Scanning을 진행한다.
+
+  특정 어노테이션이 설정된 클래스들을 스캐닝해서 빈으로 알아서 등록해준다.
+
+[^2]:어떠한 오퍼레이션(또는 연산)도 정의되지 않은 결과를 내놓지 않는것, 즉, 예측불가능한 결과를 내지 않는것을 뜻한다.
+
+```java
+@Configuration
+@ComponentScan(basePackageClasses = SpringapplicationcontextApplication.class)
+public class ApplicationConfig {
+}
+```
+
+```java
+@Repository
+public class BookRepository {}
+```
+
+```java
+@Service
+public class BookService {...}
+```
+
+
+
+이 방식이 스프링부트를 이용해 빈을 설정하는 방식에 가장 가까운 방법이다.
+
+물론 스프링부트 프로젝트에서 `ApplicationContext`를 직접 만들어서 사용하고 있진 않다. 이것 또한 스프링이 알아서 생성해준다.
+
+
+
+### 5. 스프링 부트에서의 빈 설정
+
+`@SpringBootApplication` 을 붙여주면 스프링이 ApplicationContext를 알아서 생성해준다.
+
+```java
+@SpringBootApplication
+public class SpringapplicationcontextApplication {
+  public static void main(String[] args) {
+  }
+}
+```
+
+
+
+@SpringBootApplication을 확인해보면 이미 `@ComponentScan` 어노테이션을 상속받고 있고, (@SpringBootConfiguration → ) `@Configuration` 이 붙어있는 것이다.
+
+사실상 위 코드의 클래스가 빈 설정파일이 되는 것이다. (따라서 별도로 만들었던 ApplicationConfig.java 파일은 불필요하다.)
 
 
 
