@@ -2,20 +2,13 @@ package dev.solar.springapplicationcontext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Arrays;
-
+@SpringBootApplication
 public class SpringapplicationcontextApplication {
     private static final Logger log = LoggerFactory.getLogger(SpringapplicationcontextApplication.class);
 
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-        String[] beanDefinitionNames = context.getBeanDefinitionNames();
-        log.debug("생성된 빈의 이름 : {}", Arrays.toString(beanDefinitionNames));
-        BookService bookService = (BookService) context.getBean("bookService");//Type cast
-        log.debug("의존성 주입이 되었는지 확인 : {}",bookService.bookRepository != null);//null이 아닌지 확인 -> true : 빈주입 성공
     }
 
 }
