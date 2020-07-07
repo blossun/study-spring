@@ -535,8 +535,29 @@ application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `compone
 
    (3) `@Autowired` 어노테이션으로 의존성 주입
 
-   ```java
+   빈으로 등록만 하면 @Autowired 어노테이션 적용이 가능하다.
+
    
+
+   직접 의존성 주입을 하던 코드 삭제
+
+   ```java
+   // ApplicationConfig.java
+   @Bean
+   public BookService bookService(BookRepository bookRepository) {
+     return new BookService();
+   }
+   ```
+
+   
+
+   `@Autowired` 어노테이션 추가
+
+   ```java
+   public class BookService {
+       @Autowired
+       BookRepository bookRepository;
+   }
    ```
 
    
