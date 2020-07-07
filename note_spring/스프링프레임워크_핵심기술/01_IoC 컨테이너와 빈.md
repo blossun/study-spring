@@ -1,66 +1,3 @@
-[강의자료 google docs](https://docs.google.com/document/d/1vYqPAtJJK3s4GDiVM406se-6KykTKQ_2QElfW94JLwI/edit)
-
-
-
-##### 학습 목표 
-
-1. 스프링 프레임워크의 핵심 기술 IoC, AOP, PSA를 이해합니다.. 
-2. 스프링 프레임워크 IoC 컨테이너의 다양한 기능을 사용할 수 있습니다. 
-3. 다양한 방법으로 빈을 정의하고 의존 관계를 주입할 수 있습니다. 
-4. 스프링 AOP를 사용하여 Aspect를 모듈화 할 수 있습니다. 
-5. 그밖에 다양한 스프링 핵심 기술을 이해하고 또 활용할 수 있습니다.
-
-![springframework_img1](https://cdn.inflearn.com/wp-content/uploads/springframework_img1.jpg)
-
-
-
-##### 학습 목차 
-
-1. IoC 컨테이너와 빈 
-2. 리소스 
-3. Validation 
-4. 데이터 바인딩 
-5. SpEL 
-6. 스프링 AOP 
-7. Null-Safety 
-
-
-
-##### 디자인 철학 
-
-* 모든 선택은 개발자의 몫. (예, 스프링이 특정 영속화 기술을 강요하지 않는다.) 
-* 다양한 관점을 지향한다. (유연성) 
-* 하위 호환성을 지킨다. (노력) 
-* API를 신중하게 설계 한다. (공들인다.) 
-* 높은 수준의 코드를 지향한다. (자랑) 
-
-
-
-> 이번 강좌로 스프링의 디자인 철학을 엿봤으면 한다.
-
-스프링인 인터페이스를 왜 이렇게 만들었을까?
-
-왜 우리 코드에서 자꾸 자기 자신을 노출시키지 않으려고 하는가?(비침투성)
-
-왜 하위 호완성을 지키려고 하는가?
-
-
-
----
-
-- [x] [15 : 54] IoC 컨테이너 1부: 스프링 IoC 컨테이너와 빈
-- [ ] [18 : 22] IoC 컨테이너 2부: ApplicationContext와 다양한 빈 설정 방법
-- [ ] [23 : 45] IoC 컨테이너 3부: @Autowire
-- [ ] [14 : 55] IoC 컨테이너 4부: @Component와 컴포넌트 스캔
-- [ ] [14 : 50] IoC 컨테이너 5부: 빈의 스코프
-- [ ] [11 : 59] IoC 컨테이너 6부: Environment 1부. 프로파일
-- [ ] [05 : 00] IoC 컨테이너 6부: Environment 2부. 프로퍼티
-- [ ] [08 : 51] IoC 컨테이너 7부: MessageSource
-- [ ] [13 : 10] IoC 컨테이너 8부: ApplicationEventPublisher
-- [ ] [06 : 58] IoC 컨테이너 9부: ResourceLoader  
-
-
-
 # IoC 컨테이너와 빈
 
 ## 1부 : 스프링 IoC 컨테이너와 빈
@@ -306,5 +243,264 @@ public class BookServiceTest {
 
 
 다음 시간에, 스프링 부트가 없을 때, 어떤식으로 XML 설정과 자바 설정을 사용할 수 있었는지 확인해보자
+
+
+
+
+
+---
+
+## ApplicationContext와 다양한 빈 설정 방법
+
+![컨테이너](https://i.imgur.com/XXzSHgo.png)
+
+스프링 IoC 컨테이너의 역할
+	● 빈 인스턴스 생성
+	● 의존 관계 설정
+	● 빈 제공
+AppcliationContext
+	● ClassPathXmlApplicationContext (XML)
+	● AnnotationConfigApplicationContext (Java)
+빈 설정
+	● 빈 명세서
+	● 빈에 대한 정의를 담고 있다.
+		○ 이름
+		○ 클래스
+		○ 스코프
+		○ 생성자 아규먼트 (constructor)
+		○ 프로퍼트 (setter)
+		○ ..
+컴포넌트 스캔
+	● 설정 방법
+		○ XML 설정에서는 context:component-scan
+		○ 자바 설정에서 @ComponentScan
+● 특정 패키지 이하의 모든 클래스 중에 @Component 애노테이션을 사용한 클래스를 빈으로 자동으로 등록 해 줌.
+
+
+
+### 1. xml 파일의 bean 태그로 직접 빈 설정
+
+고전적인 방식으로 현재 거의 쓰지 않는 방식이다.
+
+1. 프로젝트 생성
+
+   [Spring Initializr] > [Dependencies] : `web` 선택
+
+   Spring Boot 프로젝트로 생성해서 `spring-boot-starter-web` 의존성만 추가하면, 우리가 학습하는데 필요한 대부분의 의존성이 추가된다.
+
+   이 3개가 우리가 주로 사용하는 모듈들이다.
+
+   ```
+   Maven: org.springframework:spring-beans:5.2.7.RELEASE
+   Maven: org.springframework:spring-context:5.2.7.RELEASE
+   Maven: org.springframework:spring-core:5.2.7.RELEASE
+   ```
+
+2. BookService와 BookRepository 클래스 생성
+
+3. `Application Context` 를 이용해서 BookService와 BookRepository를 빈으로 등록
+
+4. main 클래스의 `@SpringBootApplication` 삭제, main 메서드 안의 run 도 삭제
+
+5. 고전적인 방식으로 스프링 빈 설정 파일을 만들어보자
+
+   스프링 IoC 컨테이너는 빈 설정파일이 있어야 한다.
+
+   [resources] > New : [XML Configuration File] > [Spring Config] > `application.xml` 파일 생성
+
+6. BookService와 BookRepository를 빈으로 직접 등록
+
+   ```java
+   <bean id="bookService" class="dev.solar.springapplicationcontext.BookService"/>
+   <bean id="bookRepository" class="dev.solar.springapplicationcontext.BookRepository"/>
+   ```
+
+   `<bean>` 태그로 빈을 생성
+
+   id 네이밍 컨벤션 : 소문자로 시작하는 카멜케이스
+
+   class : bean의 타입을 지정
+
+   scope : 스코프를 지정
+
+   	* prototype : 매번 객체를 생성
+   	* request : request 당 객체를 생성
+   	* session : session 당 객체를 생성
+   	* singleton : 하나의 객체만 생성 (default)
+
+   autowire : 모드를 지정
+
+   	* default : 기본값 (뒤에서 자세히 설명)
+   	*  byType
+   	* byName
+   	* constructor
+   	* no
+
+   지금은 빈을 등록만한 상태이기 때문에 BookService에서 BookRepository를 주입받지 못한다.
+
+   따라서 빈설정 파일에서 주입시켜줘야 한다.
+
+ 7.  BookService에 BookRepository를 주입
+
+    `<property>` 태그 사용
+
+    name : BookRepository의 setter에서 이름을 가져옴
+
+    ref : 다른 빈을 참조하도록 `해당 빈의 id`를 값으로 설정
+
+    ```java
+    <bean id="bookService" class="dev.solar.springapplicationcontext.BookService"/>
+      <property name="bookRepository" ref="bookRepository" />
+    </bean>
+    ```
+
+8. 앞서 만든 빈을 사용하는 ApplicationContext를 만들어서 사용
+
+   ```java
+   public class SpringapplicationcontextApplication {
+      private static final Logger log = LoggerFactory.getLogger(SpringapplicationcontextApplication.class);
+     
+     public static void main(String[] args) {
+       ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
+       String[] beanDefinitionNames = context.getBeanDefinitionNames();
+   		log.debug("생성된 빈의 이름 : {}", Arrays.toString(beanDefinitionNames));
+     }
+   }
+   ```
+
+   
+
+   출력결과
+
+   - 빈으로 등록되어있는 빈들의 이름을 확인
+
+   ![bean등록](https://i.imgur.com/ibPNgxg.png)
+
+   
+
+   `getBean()` 으로 빈을 가져올 수 있다. Object 타입으로 반환되므로 형변환 필요
+
+   ```java
+   BookService bookService = (BookService) context.getBean("bookService");//Type cast
+   ```
+
+   
+
+   null이 아니면 의존성 주입이 잘 된 것이므로 출력해서 확인해보자
+
+   ```java
+   log.debug("의존성 주입이 되었는지 확인 : {}",bookService.bookRepository != null);//null이 아닌지 확인 -> true : 빈주입 성공
+   ```
+
+   
+
+##### 단점
+
+* 일일이 빈으로 등록하고 주입을 해줘야 한다.
+
+  그래서 등장한 것이  `context:component-scan`이다.
+
+
+
+### 2. xml 파일의 Context:component-scan 으로 빈 등록
+
+1. application.xml 파일에 context:component-scan 태그로 빈 스캔
+
+   base-package : 스캐닝 대상이 될 패키지명 등록 (메인 패키지명 입력)
+
+   ```xml
+   <context:component-scan base-package="dev.solar.springapplicationcontext"/>
+   ```
+
+   
+
+   application.xml 파일
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <beans xmlns="http://www.springframework.org/schema/beans"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:context="http://www.springframework.org/schema/context"
+          xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+       <context:component-scan base-package="dev.solar.springapplicationcontext"/>
+   </beans>
+   
+   ```
+
+2. 어노테이션을 이용해서 빈 등록
+
+   기본적으로 `@Component` 어노테이션을 사용해서 빈으로 등록할 수 있다.
+
+   뿐만 아니라 `@Component` 어노테이션을 상속받은 `@Service` , `@Repository` 등의 어노테이션으로도 빈등록이 가능
+
+   ![service어노테이션](https://i.imgur.com/HNrZui5.png)
+
+   
+
+   ```java
+   @Service
+   public class BookService { ... }
+   ```
+
+   ```java
+   @Repository
+   public class BookRepository {}
+   ```
+
+   
+
+   이렇게만 하면 빈이 등록만 되고, 의존성 주입은 되지 않는다.
+
+3. 빈 주입
+
+   `@Autowired` 또는 `@Inject` 어노테이션으로 빈을 주입받을 수 있다.
+
+   `@Inject` 어노테이션은 별도의 의존성이 추가로 필요하므로 `@Autowired` 로 주입받자
+
+   ```java
+   @Service
+   public class BookService {
+   
+       @Autowired
+       BookRepository bookRepository;
+   
+       public void setBookRepository(BookRepository bookRepository) {
+           this.bookRepository = bookRepository;
+       }
+   }
+   ```
+
+   
+
+   다시 실행해보면 빈이 생성되고, 주입도 성공한 것을 확인할 수 있다.
+
+   ![빈생성 확인](https://i.imgur.com/BvILPso.png)
+
+
+
+
+
+
+
+application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `component-scan` 기능을 사용해서 설정한 패키지 하위에 존재하는 어노테이션들을 스캐닝하여 클래스들을 빈으로 생성해준다.
+
+
+
+### 3. 자바 코드를 이용한 빈 설정
+
+1. 자바 설정 파일임을 알려주는 `@Configuration` 어노테이션을 사용하여 빈 설정파일을 생성
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
