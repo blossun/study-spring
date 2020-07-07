@@ -496,9 +496,9 @@ application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `compone
 
 2. BookService에 직접 BookRepository 의존성을 주입할 수 있다.
 
-   (1) setter을 이용해서 필요한 빈을 주입
+   * **setter을 이용해서 필요한 빈을 주입**
 
-   의존성 주입에 필요한 인스턴스는 메서드로 호출해서 가져와 넘김
+   (1) 의존성 주입에 필요한 인스턴스는 메서드로 호출해서 가져와 넘김
 
    ```java
    @Configuration
@@ -557,6 +557,37 @@ application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `compone
    public class BookService {
        @Autowired
        BookRepository bookRepository;
+   }
+   ```
+
+   
+
+   * **생성자를 통한 빈 주입**
+
+   ```java
+   @Configuration
+   public class ApplicationConfig {
+   
+     @Bean
+     public BookRepository bookRepository() {
+       return new BookRepository();
+     }
+   
+     @Bean
+     public BookService bookService(BookRepository bookRepository) {
+       return new BookService(bookRepository);
+     }
+   }
+   ```
+
+   ```java
+   public class BookService {
+   
+     BookRepository bookRepository;
+   
+     public BookService(BookRepository bookRepository) {
+       this.bookRepository = bookRepository;
+     }
    }
    ```
 
