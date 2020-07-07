@@ -149,6 +149,8 @@ Bean factory 구현은 가능한 표준 Bean라이프 사이클 인터페이스�
 
    ![라이프사이클 인터페이스](https://i.imgur.com/G0a5Rgs.png)
 
+
+
 우리가 직접 IoC 기능을 하는 코드를 작성할 수도 있지만, 위의 장점들 때문에 빈으로 등록해서 스프링이 제공해주는 IoC 컨테이너 기능을 사용하는 이유이다.
 
 
@@ -243,8 +245,6 @@ public class BookServiceTest {
 
 
 다음 시간에, 스프링 부트가 없을 때, 어떤식으로 XML 설정과 자바 설정을 사용할 수 있었는지 확인해보자
-
-
 
 
 
@@ -355,6 +355,8 @@ AppcliationContext
     ```
 
 8. 앞서 만든 빈을 사용하는 ApplicationContext를 만들어서 사용
+
+   `ClassPathXmlApplicationContext` 로 ApplicationContext를 생성
 
    ```java
    public class SpringapplicationcontextApplication {
@@ -478,10 +480,6 @@ AppcliationContext
 
 
 
-
-
-
-
 application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `component-scan` 기능을 사용해서 설정한 패키지 하위에 존재하는 어노테이션들을 스캐닝하여 클래스들을 빈으로 생성해준다.
 
 
@@ -490,13 +488,105 @@ application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `compone
 
 1. 자바 설정 파일임을 알려주는 `@Configuration` 어노테이션을 사용하여 빈 설정파일을 생성
 
+   메소드명 : bean의 id
+
+   반환타입 : bean의 타입
+
+   
+
+2. BookService에 직접 BookRepository 의존성을 주입할 수 있다.
+
+   (1) setter을 이용해서 필요한 빈을 주입
+
+   의존성 주입에 필요한 인스턴스는 메서드로 호출해서 가져와 넘김
+
+   ```java
+   @Configuration
+   public class ApplicationConfig {
+   
+     @Bean
+     public BookRepository bookRepository() {
+       return new BookRepository();
+     }
+   
+     @Bean
+     public BookService bookService() {
+       BookService bookService = new BookService();
+       bookService.setBookRepository(bookRepository()); //직접 의존성 주입
+       return bookService;
+     }
+   }
+   ```
+
+   
+
+   (2) 메서드 파라미터로 넘겨받아서 의존성 주입
+
+   ```java
+   @Bean
+   public BookService bookService(BookRepository bookRepository) {
+     BookService bookService = new BookService();
+     bookService.setBookRepository(bookRepository);
+     return bookService;
+   }
+   ```
+
+   
+
+   (3) `@Autowired` 어노테이션으로 의존성 주입
+
+   ```java
+   
+   ```
+
+   
+
+3. 앞서 만든 빈을 사용하는 ApplicationContext를 만들어서 사용
+
+   `AnnotationConfigApplicationContext` 로 ApplicationContext를 생성
+
+   지정한 클래스를 빈설정 파일로 사용한다.
+
+   ```java
+   ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
+   ```
+
+   
+
+   빈설정에서 `@Bean`으로 빈 정의를 읽어서 빈으로 등록하고 정의해준 대로 의존성 주입을 한다.
+
+   
+
+   <전체코드>
+
+   ```java
+   public class SpringapplicationcontextApplication {
+       private static final Logger log = LoggerFactory.getLogger(SpringapplicationcontextApplication.class);
+   
+       public static void main(String[] args) {
+           ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
+           String[] beanDefinitionNames = context.getBeanDefinitionNames();
+           log.debug("생성된 빈의 이름 : {}", Arrays.toString(beanDefinitionNames));
+           BookService bookService = (BookService) context.getBean("bookService");//Type cast
+           log.debug("의존성 주입이 되었는지 확인 : {}",bookService.bookRepository != null);//null이 아닌지 확인 -> true : 빈주입 성공
+       }
+   
+   }
+   ```
+
+   ![자바코드로 빈주입](https://i.imgur.com/iF6pfa7.png)
 
 
 
+##### 단점
+
+하지만 여전히 `@Bean` 어노테이션으로 일일이 지정하여 만드는 불편함이 있다.
+
+xml에서 component scanning을 했던 것처럼 자바코드로도 스캐닝을 할 수 있다.
 
 
 
-
+### 4. 
 
 
 

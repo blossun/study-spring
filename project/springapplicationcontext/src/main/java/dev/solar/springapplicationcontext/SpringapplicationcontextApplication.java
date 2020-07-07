@@ -2,7 +2,8 @@ package dev.solar.springapplicationcontext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;
 
@@ -10,7 +11,7 @@ public class SpringapplicationcontextApplication {
     private static final Logger log = LoggerFactory.getLogger(SpringapplicationcontextApplication.class);
 
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
+        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
         String[] beanDefinitionNames = context.getBeanDefinitionNames();
         log.debug("생성된 빈의 이름 : {}", Arrays.toString(beanDefinitionNames));
         BookService bookService = (BookService) context.getBean("bookService");//Type cast
