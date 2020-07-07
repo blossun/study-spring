@@ -278,7 +278,9 @@ AppcliationContext
 
 
 
-### 고전 방식으로 직접 빈 설정
+### 1. xml 파일의 bean 태그로 직접 빈 설정
+
+고전적인 방식으로 현재 거의 쓰지 않는 방식이다.
 
 1. 프로젝트 생성
 
@@ -400,7 +402,79 @@ AppcliationContext
 
 
 
-### Context:component-scan 으로 빈 등록
+### 2. xml 파일의 Context:component-scan 으로 빈 등록
+
+1. application.xml 파일에 context:component-scan 태그로 빈 스캔
+
+   base-package : 스캐닝 대상이 될 패키지명 등록 (메인 패키지명 입력)
+
+   ```xml
+   <context:component-scan base-package="dev.solar.springapplicationcontext"/>
+   ```
+
+   
+
+   application.xml 파일
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <beans xmlns="http://www.springframework.org/schema/beans"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:context="http://www.springframework.org/schema/context"
+          xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+       <context:component-scan base-package="dev.solar.springapplicationcontext"/>
+   </beans>
+   
+   ```
+
+2. 어노테이션을 이용해서 빈 등록
+
+   기본적으로 `@Component` 어노테이션을 사용해서 빈으로 등록할 수 있다.
+
+   뿐만 아니라 `@Component` 어노테이션을 상속받은 `@Service` , `@Repository` 등의 어노테이션으로도 빈등록이 가능
+
+   ![service어노테이션](https://i.imgur.com/HNrZui5.png)
+
+   
+
+   ```java
+   @Service
+   public class BookService { ... }
+   ```
+
+   ```java
+   @Repository
+   public class BookRepository {}
+   ```
+
+   
+
+   이렇게만 하면 빈이 등록만 되고, 의존성 주입은 되지 않는다.
+
+3. 빈 주입
+
+   `@Autowired` 또는 `@Inject` 어노테이션으로 빈을 주입받을 수 있다.
+
+   `@Inject` 어노테이션은 별도의 의존성이 추가로 필요하므로 `@Autowired` 로 주입받자
+
+   ```java
+   @Service
+   public class BookService {
+   
+       @Autowired
+       BookRepository bookRepository;
+   
+       public void setBookRepository(BookRepository bookRepository) {
+           this.bookRepository = bookRepository;
+       }
+   }
+   ```
+
+   
+
+   다시 실행해보면 빈이 생성되고, 주입도 성공한 것을 확인할 수 있다.
+
+   ![빈생성 확인](https://i.imgur.com/BvILPso.png)
 
 
 
@@ -408,19 +482,13 @@ AppcliationContext
 
 
 
+application.xml 파일을 읽어들이긴 하지만 xml에 들어있는 `component-scan` 기능을 사용해서 설정한 패키지 하위에 존재하는 어노테이션들을 스캐닝하여 클래스들을 빈으로 생성해준다.
 
 
 
+### 3. 자바 코드를 이용한 빈 설정
 
-
-
-
-
-
-
-
-
-
+1. 자바 설정 파일임을 알려주는 `@Configuration` 어노테이션을 사용하여 빈 설정파일을 생성
 
 
 
