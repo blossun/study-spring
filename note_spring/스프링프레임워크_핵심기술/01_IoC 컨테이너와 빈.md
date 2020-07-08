@@ -331,7 +331,7 @@ AppcliationContext
    autowire : 모드를 지정
 
    	* default : 기본값 (뒤에서 자세히 설명)
-   	*  byType
+   	* byType
    	* byName
    	* constructor
    	* no
@@ -700,6 +700,124 @@ public class SpringapplicationcontextApplication {
 @SpringBootApplication을 확인해보면 이미 `@ComponentScan` 어노테이션을 상속받고 있고, (@SpringBootConfiguration → ) `@Configuration` 이 붙어있는 것이다.
 
 사실상 위 코드의 클래스가 빈 설정파일이 되는 것이다. (따라서 별도로 만들었던 ApplicationConfig.java 파일은 불필요하다.)
+
+
+
+---
+
+## @Autowire
+
+필요한 의존 객체의 “타입"에 해당하는 빈을 찾아 주입한다.
+
+@Autowired
+
+​	● required: 기본값은 true (따라서 못 찾으면 애플리케이션 구동 실패)
+
+사용할 수 있는 위치
+
+​	● 생성자 (스프링 4.3 부터는 생략 가능)
+​	● 세터
+​	● 필드
+
+경우의 수
+
+​	● 해당 타입의 빈이 없는 경우
+​	● 해당 타입의 빈이 한 개인 경우
+​	● 해당 타입의 빈이 여러 개인 경우
+​		○ 빈 이름으로 시도,
+​			■ 같은 이름의 빈 찾으면 해당 빈 사용
+​			■ 같은 이름 못 찾으면 실패
+
+같은 타입의 빈이 여러개 일 때
+
+​	● @Primary
+​	● 해당 타입의 빈 모두 주입 받기
+​	● @Qualifier (빈 이름으로 주입)
+
+동작 원리
+
+​	● 첫시간에 잠깐 언급했던 빈 라이프사이클 기억하세요?
+​	● BeanPostProcessor
+​		○ 새로 만든 빈 인스턴스를 수정할 수 있는 라이프 사이클 인터페이스
+​	● AutowiredAnnotationBeanPostProcessor extends BeanPostProcessor
+​		○ 스프링이 제공하는 @Autowired와 @Value 애노테이션 그리고 JSR-330의
+​				@Inject 애노테이션을 지원하는 애노테이션 처리기.
+
+
+
+1. 프로젝트 생성
+
+[Spring Initializr] > [Dependencies] : `web` 선택
+
+BookService와 BookRepository 클래스를 생성 후, BookService만 @Service 로 빈으로 만들고 BookRepository는 빈으로 등록하지 않은 상태에서 BookService에서 BookRepository 의존성 주입을 해보자
+
+2. 의존성 주입
+
+(1) 생성자로 주입
+
+IDE에서 BookRepository로 등록된 빈이 없어서 알려주고 있지만 의도한 코드이므로 무시하고 넘어간다.
+
+![생성자 빈주입](https://i.imgur.com/rQa0Y58.png)
+
+
+
+애플리케이션을 실행하여 오류를 확인
+
+⇒ 오류 내용 : BookService 생성자의 0번째 파라미터에 해당하는 BookRepository 빈이 없다.
+
+⇒ 해결 방안 : BookRepository에 해당하는 빈을 정의해라
+
+```
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in dev.solar.demospring51.BookService required a bean of type 'dev.solar.demospring51.BookRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'dev.solar.demospring51.BookRepository' in your configuration.
+
+
+Process finished with exit code 1
+```
+
+
+
+BookRepository에 @Repository 를 붙여주자
+
+@Component 어노트에션을 붙일 수도 있지만 Repository로 활용할 클래스이기 때문에 @Repository를 붙여주는 것이 좋다. 특정한 기능을 실행시킬 수도 있고, AOP에서도 사용하기 더 좋기 때문에 구분해서 쓰는 것이 더 좋다.
+
+다시 실행하면 에러 없이 잘 주입이 되는 것을 확인할 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
