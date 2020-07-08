@@ -903,6 +903,68 @@ Consider marking one of the beans as @Primary, updating the consumer to accept m
 
 
 
+##### 1.  @Primary 를 붙여서 마킹
+
+사용하고자 하는 빈에 `@Primary` 어노테이션을 붙인다.
+
+```java
+@Repository @Primary
+public class SolarBookRepository implements BookRepository{}
+```
+
+
+
+어떠한 빈이 주입됐는지 확인하기 힘드므로 `ApplicationRunner` 구현체를 하나 만들어 주자 (참고. 이 내용은 스프링 부트 강좌에서)
+
+BookService에서 주입받은 BookRepository 구현체가 어떤 것이지 내용을 출력해주는 메서드 생성
+
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  BookRepository bookRepository;
+
+  public void printBookRepository() {
+    System.out.println(bookRepository.getClass());
+  }
+}
+```
+
+
+
+Runner에서 해당 메서드를 호출
+
+```java
+@Component
+public class BookServiceRunner implements ApplicationRunner {
+
+  @Autowired
+  BookService bookService;
+
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    bookService.printBookRepository();
+  }
+}
+```
+
+
+
+애플리케이션을 실행하면 (자동으로) Runner들을 전부 쭉 호출해준다.
+
+![주입된 빈 클래스 확인](https://i.imgur.com/rikgJwq.png)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
