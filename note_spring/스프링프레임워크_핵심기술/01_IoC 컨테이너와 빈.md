@@ -795,17 +795,44 @@ BookRepository에 @Repository 를 붙여주자
 
 
 
+(2) Setter로 주입
+
+![setter 주입](https://i.imgur.com/14G3QSS.png)
 
 
 
+BookRepository에 @Repository를 붙이지 않고 실행하면 동일하게 오류가 나는 것을 확인할 수 있다.
 
 
 
+> 생성자로 주입한 경우와 Setter로 주입한 경우에 발생한 에러에서 알 수 있는 점
+
+생성자로 주입한 경우 `BookService`를 만드려고 할 때 부터 에러가 나는 것은 분명하다.
+
+Setter로 주입하는 경우, Setter를 호출할 때 해당하는 빈이 없어서 오류가 나는 것은 맞지만, BookService 인스턴스 자체는 만들 수 있는 것 아닌가?
+
+맞는 말이지만, `@Autowired` 라는 어노테이션이 붙어있기 때문에 BookService `빈을 생성할 때` 의존성을 주입하려고 시도한다. 따라서 실행 시 오류가 발생하는 것이다.
 
 
 
+`@Autowired` 어노테이션이 필수가 아니라 옵셔널한 사항이라면 `@Autowired(required = false)` 로  설정해서 실행하면 에러가 발생하지 않는다.
+
+```java
+@Service
+public class BookService {
+
+  BookRepository bookRepository;
+
+  @Autowired(required = false)
+  public void setBookRepository(BookRepository bookRepository) {
+    this.bookRepository = bookRepository;
+  }
+}
+```
 
 
+
+(3) 필드로 주입
 
 
 

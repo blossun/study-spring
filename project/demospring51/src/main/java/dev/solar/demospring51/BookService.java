@@ -8,8 +8,8 @@ public class BookService {
 
     BookRepository bookRepository;
 
-    @Autowired
-    public BookService(BookRepository bookRepository) {
+    @Autowired(required = false)
+    public void setBookRepository(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 }
