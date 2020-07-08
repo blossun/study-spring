@@ -1008,13 +1008,30 @@ public class BookService {
 
 
 
+#### 빈의 이름과 동일한 필드명으로 주입받기
+
  @Autowired는 타입 뿐만 아니라 이름도 확인한다.
 
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  BookRepository myBookRepository;
+
+  public void printBookRepository() {
+    System.out.println(myBookRepository.getClass());
+  }
+}
+```
+
+![필드명](https://i.imgur.com/CdDuFLw.png)
 
 
 
+**우선순위**
 
-
+빈과 동일한 필드명으로 적었어도 특정 빈에 `@primary`가 붙어있다면 해당하는 빈으로 생성된다.
 
 
 
