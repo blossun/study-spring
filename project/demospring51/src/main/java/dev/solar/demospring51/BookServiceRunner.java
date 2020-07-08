@@ -12,7 +12,6 @@ public class BookServiceRunner implements ApplicationRunner {
     BookService bookService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        bookService.printBookRepository();
+    public void run(ApplicationArguments args) {
     }
 }

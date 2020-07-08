@@ -80,11 +80,13 @@ public BookService(BookRepository repository) {
 
 [문서](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanFactory.html)
 
-스프링의 가장 최상위에 있는 인터페이스는 `BeanFactory`라는 인터페이스이다. 
+스프링의 가장 최상위에 있는 인터페이스는 `BeanFactory`라는 인터페이스이다. IoC의 핵심적인 클래스이다.
 
-IoC의 핵심적인 클래스이다.
+Bean factory 구현은 가능한 표준 Bean라이프 사이클 인터페이스를 지원해야한다.
 
-Bean factory 구현은 가능한 표준 Bean라이프 사이클 인터페이스를 지원해야한다. 전체 초기화 방법과 표준 순서는 다음과 같다. (인터페이스명)
+
+
+ **전체 초기화 방법과 표준 순서**
 
 1. BeanNameAware's `setBeanName`
 2. BeanClassLoaderAware's `setBeanClassLoader`
@@ -903,7 +905,7 @@ Consider marking one of the beans as @Primary, updating the consumer to accept m
 
 
 
-#### 1.  @Primary 를 붙여서 마킹
+#### 1.  @Primary 를 붙여서 마킹(추천)
 
 사용하고자 하는 빈에 `@Primary` 어노테이션을 붙인다.
 
@@ -1008,7 +1010,7 @@ public class BookService {
 
 
 
-#### 빈의 이름과 동일한 필드명으로 주입받기
+#### 빈의 이름과 동일한 필드명으로 주입받기(비추천)
 
  @Autowired는 타입 뿐만 아니라 이름도 확인한다.
 
@@ -1035,18 +1037,123 @@ public class BookService {
 
 
 
+#### 동작원리
+
+`BeanPostProcessor` 라는 라이프 사이클 인터페이스의 구현체에 의해서 동작한다.
+
+##### BeanPostProcessor
+
+* 새로 만든 빈 인스턴스를 수정할 수 있는 라이프 사이클 인터페이스
+
+* 빈을 만들고 빈의 인스턴스를 만든 다음에 빈의 initialize 라이프 사이클이 있다.
+* 빈의 initialize 라이프 사이클 전후로 추가적인 동작을 구현할 수 있는 라이프 사이클 콜백이 `BeanPostProcessor`이다.
 
 
 
+##### 1. @PostConstruct
+
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  BookRepository myBookRepository;
+
+  public void printBookRepository() {
+    System.out.println(myBookRepository.getClass());
+  }
+
+  @PostConstruct
+  public void setUp() {
+    //이 빈이 만들어진 다음에 해야할 동작을 정의
+  }
+}
+```
 
 
 
+##### 2. InitializingBean 상속
+
+* afterPropertiesSet() 를 구현해야함
+
+```java
+@Service
+public class BookService implements InitializingBean {
+
+  @Autowired
+  BookRepository myBookRepository;
+
+  public void printBookRepository() {
+    System.out.println(myBookRepository.getClass());
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    //이 빈이 만들어진 다음에 해야할 동작을 정의
+  }
+}
+```
 
 
 
+그 중 `AutowiredAnnotationBeanPostProcessor` 가 동작해서 @Autowired 어노테이션을 처리(해당 하는 빈을 찾아서 주입)해주는 것이다.
 
 
 
+> 참고 : [BeanFactory Spring Docs](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/BeanFactory.html)
+>
+> [AutowiredAnnotationBeanPostProcessor](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/annotation/AutowiredAnnotationBeanPostProcessor.html)
+
+
+
+따라서 기존에 생성된 빈 정보를 출력하는 printBookRepository() 코드를 `@PostConstruct` 으로 작성해도 동일하다.
+
+이미 빈이 생성된 후의 라이프 사이클에서 동작하는 코드 임을 알아야 한다.
+
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  BookRepository myBookRepository;
+
+  @PostConstruct
+  public void setUp() {
+    System.out.println(myBookRepository.getClass());
+  }
+}
+```
+
+![PostConstruct 코드](https://i.imgur.com/DkYbWAU.png)
+
+
+
+클래스 이름이 찍힌 위치가 다르다. Runner는 애플리케이션이 구동이 완료된 이후에 실행되는 반면에 @PostConstruct 라이프사이클 콜백은 InitializingBean's `afterPropertiesSet` 단계에서 실행되는 것이기 때문이다.
+
+
+
+**라이프 사이클**
+
+1. BeanNameAware's `setBeanName`
+2. BeanClassLoaderAware's `setBeanClassLoader`
+3. BeanFactoryAware's `setBeanFactory`
+4. EnvironmentAware's `setEnvironment`
+5. EmbeddedValueResolverAware's `setEmbeddedValueResolver`
+6. ResourceLoaderAware's `setResourceLoader` (only applicable when running in an application context)
+7. ApplicationEventPublisherAware's `setApplicationEventPublisher` (only applicable when running in an application context)
+8. MessageSourceAware's `setMessageSource` (only applicable when running in an application context)
+9. ApplicationContextAware's `setApplicationContext` (only applicable when running in an application context)
+10. ServletContextAware's `setServletContext` (only applicable when running in a web application context)
+11. `postProcessBeforeInitialization` methods of BeanPostProcessors
+12. InitializingBean's `afterPropertiesSet` <------ ** 
+13. a custom init-method definition
+14. `postProcessAfterInitialization` methods of BeanPostProcessors
+
+
+
+ `BeanPostProcessor`구현체 중 하나가 동작하는 것이라고 생각하면된다.
+
+BeanFactory가 자신에게 등록되어있느 `BeanPostProcessor`타입의 빈을 찾는다.  구현체 중에 하나인 `AutowiredAnnotationBeanPostProcessor`가 빈으로 등록되어있는 것이다.  `AutowiredAnnotationBeanPostProcessor`에 실제 어노테이션을 처리하는 로직들이 정이되어있고 이를 다른 일반적인 빈들한테 적용하는 것이다.
 
 
 
