@@ -23,6 +23,17 @@ public class Demospring51Application {
             @Override
             public void initialize(GenericApplicationContext ctx) {
                 ctx.registerBean(MyService.class);
+                ctx.registerBean(ApplicationRunner.class, new Supplier<ApplicationRunner>() {
+                    @Override
+                    public ApplicationRunner get() {
+                        return new ApplicationRunner() {
+                            @Override
+                            public void run(ApplicationArguments args) throws Exception {
+                                System.out.println("Functional Bean Definition!!");
+                            }
+                        };
+                    }
+                });
             }
         });
         app.run(args);
