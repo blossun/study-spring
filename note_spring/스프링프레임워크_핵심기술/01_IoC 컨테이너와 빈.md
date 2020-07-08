@@ -989,9 +989,26 @@ public class BookService {
 
 
 
+#### 해당 타입의 빈 모두 주입받기
+
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  List<BookRepository> bookRepositories;
+
+  public void printBookRepository() {
+    this.bookRepositories.forEach(System.out::println);
+  }
+}
+```
+
+![모든 빈 주입받기](https://i.imgur.com/ZWgKeBA.png)
 
 
- 
+
+ @Autowired는 타입 뿐만 아니라 이름도 확인한다.
 
 
 
