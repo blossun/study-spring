@@ -755,7 +755,7 @@ BookService와 BookRepository 클래스를 생성 후, BookService만 @Service �
 
 ### @Autowired 사용할 수 있는 위치
 
-##### 1. 생성자로 주입
+#### 1. 생성자로 주입
 
 IDE에서 BookRepository로 등록된 빈이 없어서 알려주고 있지만 의도한 코드이므로 무시하고 넘어간다.
 
@@ -797,7 +797,7 @@ BookRepository에 @Repository 를 붙여주자
 
 
 
-##### 2. Setter로 주입
+#### 2. Setter로 주입
 
 ![setter 주입](https://i.imgur.com/14G3QSS.png)
 
@@ -834,7 +834,7 @@ public class BookService {
 
 
 
-##### 3. 필드로 주입
+#### 3. 필드로 주입
 
 필드 주입 시에도 @Autowired 설정을 required = false로 설정해서 옵셔널하게 지정하면 에러 없이 빈 생성이 가능하다.
 
@@ -903,7 +903,7 @@ Consider marking one of the beans as @Primary, updating the consumer to accept m
 
 
 
-##### 1.  @Primary 를 붙여서 마킹
+#### 1.  @Primary 를 붙여서 마킹
 
 사용하고자 하는 빈에 `@Primary` 어노테이션을 붙인다.
 
@@ -957,11 +957,41 @@ public class BookServiceRunner implements ApplicationRunner {
 
 
 
+#### 2. @Qualifier(빈 이름) 으로 주입
+
+@Repository 어노테이션을 쓰면 이 빈의 id는 small case로 시작하는 빈의 이름과 동일하게 된다.
+
+```java
+@Repository
+public class SolarBookRepository implements BookRepository{} //-> 빈 id : solarBookRepository
+```
+
+
+
+`@Qualifier("빈이름")`으로 지정해주면 된다.
+
+```java
+@Service
+public class BookService {
+
+  @Autowired @Qualifier("solarBookRepository")
+  BookRepository bookRepository;
+
+  public void printBookRepository() {
+    System.out.println(bookRepository.getClass());
+  }
+}
+```
+
+
+
+하지만,  좀 더 Type Safety한 `@Primary` 방식을 사용할 것을 추천한다.
 
 
 
 
 
+ 
 
 
 
