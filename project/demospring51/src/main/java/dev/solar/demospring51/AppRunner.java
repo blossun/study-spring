@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppRunner implements ApplicationRunner {
 
-
     @Autowired
     ApplicationContext ctx;
 
@@ -26,6 +25,12 @@ public class AppRunner implements ApplicationRunner {
         System.out.println(ctx.getBean(Single.class));
         System.out.println(ctx.getBean(Single.class));
         System.out.println(ctx.getBean(Single.class));
+
+        System.out.println("proto by single");
+
+        System.out.println(ctx.getBean(Single.class).getProto());
+        System.out.println(ctx.getBean(Single.class).getProto());
+        System.out.println(ctx.getBean(Single.class).getProto());
     }
 }
 
