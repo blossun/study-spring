@@ -1132,7 +1132,7 @@ public class BookService {
 
 
 
-**라이프 사이클**
+**※ 라이프 사이클**
 
 1. BeanNameAware's `setBeanName`
 2. BeanClassLoaderAware's `setBeanClassLoader`
@@ -1157,7 +1157,9 @@ BeanFactory가 자신에게 등록되어있느 `BeanPostProcessor`타입의 빈�
 
 
 
-**`AutowiredAnnotationBeanPostProcessor`가 빈으로 등록되어 있다는 것을 확인하는 방법**
+**※ `AutowiredAnnotationBeanPostProcessor`가 빈으로 등록되어 있다는 것을 확인하는 방법**
+
+빈을 직접 가져올 수 있고, 빈을 담고 있는 ApplicationContext를 가져와서 빈을 꺼낼 수 있다.
 
 1. ApplicationRunner를 생성 후, ApplicationContext를 주입받아서 AutowiredAnnotationBeanPostProcessor 빈을 꺼내와 확인
 
@@ -1180,7 +1182,19 @@ public class MyRunner implements ApplicationRunner {
 
 2. AutowiredAnnotationBeanPostProcessor 가 이미 빈으로 등록이 되어있으므로 @Autowired 로 바로 받아올 수 있다.
 
+```java
+@Component
+public class MyRunner implements ApplicationRunner {
 
+  @Autowired
+  AutowiredAnnotationBeanPostProcessor processor;
+
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    System.out.println(processor);
+  }
+}
+```
 
 
 
