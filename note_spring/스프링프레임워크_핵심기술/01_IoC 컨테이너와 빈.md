@@ -705,7 +705,7 @@ public class SpringapplicationcontextApplication {
 
 ---
 
-## @Autowire
+## @Autowired
 
 필요한 의존 객체의 “타입"에 해당하는 빈을 찾아 주입한다.
 
@@ -751,9 +751,11 @@ public class SpringapplicationcontextApplication {
 
 BookService와 BookRepository 클래스를 생성 후, BookService만 @Service 로 빈으로 만들고 BookRepository는 빈으로 등록하지 않은 상태에서 BookService에서 BookRepository 의존성 주입을 해보자
 
-2. 의존성 주입
 
-(1) 생성자로 주입
+
+### @Autowired 사용할 수 있는 위치
+
+##### 1. 생성자로 주입
 
 IDE에서 BookRepository로 등록된 빈이 없어서 알려주고 있지만 의도한 코드이므로 무시하고 넘어간다.
 
@@ -795,7 +797,7 @@ BookRepository에 @Repository 를 붙여주자
 
 
 
-(2) Setter로 주입
+##### 2. Setter로 주입
 
 ![setter 주입](https://i.imgur.com/14G3QSS.png)
 
@@ -832,7 +834,41 @@ public class BookService {
 
 
 
-(3) 필드로 주입
+##### 3. 필드로 주입
+
+필드 주입 시에도 @Autowired 설정을 required = false로 설정해서 옵셔널하게 지정하면 에러 없이 빈 생성이 가능하다.
+
+```java
+@Service
+public class BookService {
+
+  @Autowired(required = false)
+  BookRepository bookRepository;
+
+}
+```
+
+
+
+* 생성자 인젝션과 Setter, 필드 인젝션의 차이
+
+  Setter와 필드 의존성 주입시에는 옵셔널하게 설정해서 해당하는 빈이 없이도 인스턴스 자체는 만들도록 할 수 있다.
+
+
+
+### 해당 타입의 빈이 여러 개인 경우
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
