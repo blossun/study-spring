@@ -858,9 +858,48 @@ public class BookService {
 
 ### 해당 타입의 빈이 여러 개인 경우
 
+BookRepository를 인터페이스로 수정하고, 이를 구현한 MyBookRepository와 SolarBookRepository 두 개의 구현체가 있는 경우
 
 
 
+다음과 같이 BookService에서 BookRepository를 주입받으려고 하면 오류가 발생한다.
+
+```java
+@Service
+public class BookService {
+
+  @Autowired
+  BookRepository bookRepository;
+
+}
+```
+
+
+
+* 오류 메시지
+
+BookService에서 필요한 bookRepository 필드에  하나의 빈이 필요한데, 해당하는 타입의 빈이 2개가 발견됐다.
+
+myBookRepository, solarBookRepository 둘 중에 어떤 것을 써야할 지 모르겠다.
+
+* 추천하는 액션
+
+	1. 여러가지 빈들 중에 `@Primary`를 붙여서 마킹을 해라
+ 	2. 모든 빈을 다 받아라
+ 	3. `@Qualifier`로 어떤 빈이 필요한지 지정해라
+
+```
+Description:
+
+Field bookRepository in dev.solar.demospring51.BookService required a single bean, but 2 were found:
+	- myBookRepository: defined in file [/Users/ssun/Develop/Project/SpringProjects/study-spring/project/demospring51/target/classes/dev/solar/demospring51/MyBookRepository.class]
+	- solarBookRepository: defined in file [/Users/ssun/Develop/Project/SpringProjects/study-spring/project/demospring51/target/classes/dev/solar/demospring51/SolarBookRepository.class]
+
+
+Action:
+
+Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+```
 
 
 
