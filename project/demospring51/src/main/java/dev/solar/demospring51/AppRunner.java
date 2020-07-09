@@ -17,6 +17,7 @@ public class AppRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         Environment environment = ctx.getEnvironment();
         System.out.println(environment.getProperty("app.name"));
+        System.out.println(environment.getProperty("app.about"));
     }
 }
 
