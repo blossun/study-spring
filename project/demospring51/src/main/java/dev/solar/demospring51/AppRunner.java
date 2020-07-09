@@ -1,6 +1,7 @@
 package dev.solar.demospring51;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
@@ -13,11 +14,15 @@ public class AppRunner implements ApplicationRunner {
     @Autowired
     ApplicationContext ctx;
 
+    @Value("${app.name}")
+    String appName;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Environment environment = ctx.getEnvironment();
         System.out.println(environment.getProperty("app.name"));
         System.out.println(environment.getProperty("app.about"));
+        System.out.println(appName);
     }
 }
 
