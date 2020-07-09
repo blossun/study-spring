@@ -18,6 +18,7 @@ public class Demospring51Application {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/messages");
         messageSource.setDefaultEncoding("UTF-8");//한글 깨짐 인코딩 설정 추가
+        messageSource.setCacheSeconds(3);
         return messageSource;
     }
 }

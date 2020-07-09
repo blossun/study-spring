@@ -16,10 +16,12 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(messageSource.getClass());
-        System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.getDefault()));
-        System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.KOREA));
-        System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.ENGLISH));
+        while(true) {
+            System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.getDefault()));
+            System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.KOREA));
+            System.out.println(messageSource.getMessage("greeting", new String[]{"Solar"}, Locale.ENGLISH));
+            Thread.sleep(10001); //1초마다 콘솔에 찍으면서 값이 변경되는지 확인
+        }
     }
 }
 
