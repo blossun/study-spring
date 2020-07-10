@@ -4,11 +4,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MyEventHandler {
+public class AnotherHandler {
 
     @EventListener
-    public void handle(MyEvent event) {
+    public void handle(MyEvent myEvent) {
         System.out.println(Thread.currentThread().toString());
-        System.out.println("이벤트 전달 받음!!!! 데이터는 : " + event.getData());
+        System.out.println("Another Handler !!! 데이터는 : " + myEvent.getData() );
     }
 }
