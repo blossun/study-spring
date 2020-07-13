@@ -211,6 +211,14 @@ public void validate(Object target, Errors errors) {
 }
 ```
 
+```
+true
+===== error code =====
+notempty.event
+notempty
+Empty title is not allowed!!
+```
+
 
 
 
