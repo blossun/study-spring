@@ -348,3 +348,10 @@ NotEmpty
 
 복잡한 비즈니스 검증 로직이 필요하다면 어노테이션이 아니라 직접 Validator를 구현해서 사용하면 된다.
 
+
+
+⇒ 실습 코드를 깃헙에 업로드했더니 org.hibernate.validator가 취약하다고 알림이 왔다.
+
+내용을 찾아보고 보안 업데이트된 라이브러리를 써야할 듯...!!
+
+![org.hibernate.validator취약점](https://i.imgur.com/QUuuEYz.png)

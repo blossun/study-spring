@@ -1,18 +1,14 @@
 package dev.solar.demospring51;
-import javax.validation.constraints.*;
 
 public class Event {
 
-    Integer id;
+    private Integer id;
 
-    @NotEmpty
-    String title;
+    private String title;
 
-    @NotNull @Min(0) @Max(100)
-    Integer limit;
-
-    @Email
-    String email;
+    public Event(Integer id) {
+        this.id = id;
+    }
 
     public Integer getId() {
         return id;
@@ -30,19 +26,11 @@ public class Event {
         this.title = title;
     }
 
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
     }
 }
