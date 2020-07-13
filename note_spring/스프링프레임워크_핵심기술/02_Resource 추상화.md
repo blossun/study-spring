@@ -11,16 +11,17 @@
 	● ServletContext를 기준으로 상대 경로로 읽어오는 기능 부재
 	● 새로운 핸들러를 등록하여 특별한 URL 접미사를 만들어 사용할 수는 있지만 구현이 복잡하고 편의성 메소드가 부족하다.
 
-인터페이스 둘러보기
-	● 상속 받은 인터페이스
-	● 주요 메소드
-			○ getInputStream()
-			○ exitst()
-			○ isOpen()
-			○ getDescription(): 전체 경로 포함한 파일 이름 또는 실제 URL
+[인터페이스 둘러보기](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/Resource.html)
+
+​	● 상속 받은 인터페이스
+​	● 주요 메소드
+​		○ getInputStream()
+​		○ exitst()
+​		○ isOpen()
+​		○ getDescription(): 전체 경로 포함한 파일 이름 또는 실제 URL
 
 구현체
-	● UrlResource: java.net.URL 참고, 기본으로 지원하는 프로토콜 http, https, ftp, file, jar.
+	● UrlResource: [java.net.URL](https://docs.oracle.com/javase/7/docs/api/java/net/URL.html) 참고, 기본으로 지원하는 프로토콜 http, https, ftp, file, jar.
 	● ClassPathResource: 지원하는 접두어 classpath:
 	● FileSystemResource
 	● ServletContextResource: 웹 애플리케이션 루트에서 상대 경로로 리소스 찾는다.

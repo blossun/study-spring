@@ -1,31 +1,34 @@
 package dev.solar.demospring51;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+
+import java.util.Arrays;
 
 @Component
 public class AppRunner implements ApplicationRunner {
 
-    @Autowired
-    ApplicationContext resourceLoader;
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(resourceLoader.getClass()); //WebApplicationContext 중 하나
+        Event event = new Event();
+        EventValidator eventValidator = new EventValidator();
 
-        Resource resource = resourceLoader.getResource("classpath:test.txt");
-        System.out.println(resource.getClass()); //classpath prefix를 썼기때문에 ClassPathResource 타입
+        //Errors 필요
+        Errors errors = new BeanPropertyBindingResult(event, "event");
 
-        Resource resource02 = resourceLoader.getResource("text.txt");
-        System.out.println(resource02.getClass()); //기본 타입 ServletContextResource
+        // 검증
+        eventValidator.validate(event, errors);
 
-        System.out.println(resource.exists());
-        System.out.println(resource.getDescription()); //전체 경로
-        System.out.println(resource02.exists());
-        System.out.println(resource02.getDescription()); //전체 경로
+        // error가 있는지 확인
+        System.out.println(errors.hasErrors());
+        // 모든 에러를 가져와서 에러를 순차적으로 순회하면서 에러코드를 출력
+        errors.getAllErrors().forEach(e -> {
+            System.out.println("===== error code =====");
+            Arrays.stream(e.getCodes()).forEach(System.out::println);
+            System.out.println(e.getDefaultMessage());
+        });
     }
 }
