@@ -47,7 +47,10 @@ Bean Validation은 자바 EE 표준 스팩이다.
 
 
 
-### Validator를 만들어서 검증 구현 (원시적인 방식)
+## 직접 Validator를 만들어서 검증 구현
+
+* 원시적인 방식
+* 복잡한 검증 로직 직접 구현 가능
 
 **※ [실습]**
 
@@ -187,7 +190,7 @@ notempty.java.lang.String)
 
 
 
-##### validate 구현
+#### Errors로 validate 구현
 
 * 반드시 ValidationUtils를 이용해야되는 것은 아니다.
 
@@ -221,31 +224,127 @@ Empty title is not allowed!!
 
 
 
+## 어노테이션을 이용한 검증 구현
+
+* 스프링 부트 2.0.5 이상 버전에서 기능 제공
+
+  최근에는 Validator를 직접 사용하는 것이 아니라 (특히나 스프링 부트를 쓰고 있다면) 기본적으로 `스프링`이 제공해주는 `LocalValidatorFactoryBean`을 자동으로 빈으로 등록해준다.
+
+* **LocalValidatorFactoryBean**
+
+  * SR-380(**Bean Validation** 2.0.1) 구현체
+  * Bean Validation 어노테이션들을 지원하는 Validator이다.
+  * 이 Validator를 바로 사용하면 된다.
 
 
 
+**※ [실습]**
+
+##### 1. 의존성 추가
+
+```xml
+<dependency>
+  <groupId>org.hibernate.validator</groupId>
+  <artifactId>hibernate-validator</artifactId>
+  <version>6.0.7.Final</version>
+</dependency>
+```
 
 
 
+##### 2. 검증 대상이 되는 필드에 어노테이션 추가
+
+* @NotNull
+* @NotEmpty
+
+* @Size : 컬렉션의 사이즈 검증
+* @Min, @Max : 데이터 값 검증
+* @Email : email 형식 검증
+
+* defaultMessage도 Validator에서 기본적으로 제공해준다.
+
+```java
+import javax.validation.constraints.*;
+
+public class Event {
+
+    Integer id;
+
+    @NotEmpty //<- 검증을 위한 어노테이션 추가
+    String title;
+
+    @NotNull @Min(0) @Max(100)
+    Integer limit;
+
+    @Email
+    String email;
+
+  	//... getter, setter
+}
+```
 
 
 
+##### 3. Runner 구현
+
+AppRunner에서 기존에 만든 EventValidator를 사용하지 않고, org.springframework.validation.Validator를 주입받아서 사용한다.
+
+```java
+@Component
+public class AppRunner implements ApplicationRunner {
+
+    @Autowired
+    Validator validator;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        System.out.println("validator : " + validator.getClass()); //어떠한 validator가 주입되는지 확인
+
+        Event event = new Event();
+        event.setLimit(-1); // 0이상 이어야 error 안 남
+        event.setEmail("hahaha"); // email 형식에 맞지 않는 문자열
+
+        Errors errors = new BeanPropertyBindingResult(event, "event");
+
+        // 검증
+        validator.validate(event, errors);
+
+        // error가 있는지 확인
+        System.out.println(errors.hasErrors());
+        // 모든 에러를 가져와서 에러를 순차적으로 순회하면서 에러코드를 출력
+        errors.getAllErrors().forEach(e -> {
+            System.out.println("===== error code =====");
+            Arrays.stream(e.getCodes()).forEach(System.out::println);
+            System.out.println(e.getDefaultMessage());
+        });
+    }
+}
+```
+
+```shell
+validator : class org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
+true
+===== error code =====
+Email.event.email
+Email.email
+Email.java.lang.String
+Email
+이메일 주소가 유효하지 않습니다. <-- Validator가 제공하는 default 메시지
+===== error code =====
+Min.event.limit
+Min.limit
+Min.java.lang.Integer
+Min
+반드시 0보다 같거나 커야 합니다.
+===== error code =====
+NotEmpty.event.title
+NotEmpty.title
+NotEmpty.java.lang.String
+NotEmpty
+반드시 값이 존재하고 길이 혹은 크기가 0보다 커야 합니다.
+```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+복잡한 비즈니스 검증 로직이 필요하다면 어노테이션이 아니라 직접 Validator를 구현해서 사용하면 된다.
 
