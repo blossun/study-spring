@@ -243,13 +243,144 @@ Event{id=1, title='null'}
 
 
 
+## ConversionService
+
+이런 타입을 변환하는 작업은 `데이터 바인더` 를 통해서 PropertyEditor를 사용했던 것 대신에 `ConversionService`에 등록되어있는 Converter와 Formatter를 사용한 것이다.
+
+* 실제 변환 작업은 이 인터페이스를 통해서 쓰레드-세이프하게 사용할 수 있음.
+* **스프링 MVC**, 빈 (value) 설정, SpEL에서 사용한다.
+* DefaultFormattingConversionService
+  * FormatterRegistry
+  * ConversionService
+  * 여러 기본 컴버터와 포매터 등록 해 줌.
 
 
 
+#### DefaultFormattingConversionService
+
+스프링이 제공해주는 여러 ConversionService 구현체들 중 하나로 ConversionService 빈으로 자주 사용이 된다. 
+
+`FormatterRegistry` 와 `ConversionService` 두가지 인터페이스를 모두 구현하였다.
+
+<img src="https://i.imgur.com/5dbVAu6.png" alt="converter formatter" style="zoom:50%;" />
+
+Converter는 ConverterRegistry에 등록해야하고, Formatter는 FormatterRegistry에 등록해야한다. FormatterRegistry가 ConverterRigstry를 상속받고 있으므로 FormatterRegistry에 Converter를 등록해서 사용할 수도 있다.
+
+```java
+@Override
+public void addFormatters(FormatterRegistry registry) {
+  registry.addConverter(new EventConverter.EventToStringConverter());
+}
+```
 
 
 
+#### **스프링 부트**에서 ConversionService 사용
 
+```java
+@Component
+public class AppRunner implements ApplicationRunner {
+
+    @Autowired
+    ConversionService conversionService;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        //ConversionService을 빈으로 주입받을 수 있는지 확인
+        System.out.println(conversionService.getClass().toString());
+    }
+}
+```
+
+실행 결과 확인
+
+```
+class org.springframework.boot.autoconfigure.web.format.WebConversionService
+```
+
+⇒  `WebConversionService`가 빈으로 등록되었다.
+
+
+
+### 스프링부트가 지원하는 기능
+
+#### 1. 웹 애플리케이션인 경우에 DefaultFormattingConversionSerivce를 상속하여 만든 **WebConversionService**를 빈으로 등록해 준다. 
+
+* **WebConversionService**는 **스프링부트**가 제공해주는 서비스이다.
+* 더 많은 기능을 제공해준다.
+
+ConversionService가 가지고 있는 Converter와 Formatter을 이용해서 타입변환을 할 수 있다.
+
+`conversionService.canConvert()`등의 메서드로
+
+프로그래밍으로 직접 이 인터페이스를 써서 컨버팅 해야한다면 conversionService를 가지고 컨버팅할 수 있다. 하지만 이런 경우도 거의 없고, ConversionService를 빈으로 주입받아서 사용하는 경우도 거의 없다.
+
+
+
+※ **WebConversionService** 소스코드 확인
+
+command + shift + F → [Scope] → WebConversionService 검색
+
+Formatter들이 추가되어있다.
+
+```java
+//WebConversionService.java
+public WebConversionService(DateTimeFormatters dateTimeFormatters) {
+  super(false);
+  if (dateTimeFormatters.isCustomized()) {
+    addFormatters(dateTimeFormatters);
+  }
+  else {
+    addDefaultFormatters(this);
+  }
+}
+```
+
+JSR_354_PRESENT ⇒ 돈 관련된 API가 ClassPath에 있으면 돈 관련 Converter를 추가
+
+JODA_TIME_PRESENT ⇒ JODA_TIME 관련된 라이브러리가 ClassPath에 있으면 JODA_TIME 관련 Converter를 추가
+
+
+
+#### 2. Formatter와 Converter 빈을 찾아 자동으로 등록해 준다
+
+따라서 WebMvcConfigurer를 따로 구현해서 Formatter를 구현해줄 필요가 없다.
+
+※ [실습 1] Converter를 구현한 클래스만 빈으로 등록해준다.
+
+기존에 WebConfig 파일 삭제, Formatter는 빈으로 등록하지 않음
+
+Converter는 상태정보를 저장하지 않기 때문에 빈으로 등록해도 안전한다.
+
+```java
+// 주의 EventConverter를 빈으로 등록하는 것이 아님
+public class EventConverter {
+
+    @Component //빈으로 등록
+    public static class StringToEventConverter implements Converter<String, Event> {
+        @Override
+        public Event convert(String source) {
+            return new Event(Integer.parseInt(source));
+        }
+    }
+
+    @Component
+    public static class EventToStringConverter implements Converter<Event, String> {
+        @Override
+        public String convert(Event source) {
+            return source.getId().toString();
+        }
+    }
+}
+```
+
+실행 후, 브라우저에서 URL 접속
+
+![url접속확인](https://i.imgur.com/kNhwPiM.png)
+
+※ [실습 2] Formatter만 빈으로 등록해준다.
+
+Converter는 빈으로 등록하지 않음
 
 
 
