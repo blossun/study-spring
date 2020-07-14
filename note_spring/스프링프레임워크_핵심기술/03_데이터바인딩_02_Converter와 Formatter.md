@@ -171,7 +171,7 @@ Integer 타입같은 경우, 기본적으로 등록이 되어있는 컨버터나
 
 
 
-## Formatter
+## Formatter (추천)
 
 스프링이 조금 더 웹에 특화되어있는 인터페이스를 만들어서 제공한다. 
 
@@ -302,7 +302,7 @@ class org.springframework.boot.autoconfigure.web.format.WebConversionService
 
 
 
-### 스프링부트가 지원하는 기능
+## 스프링부트가 지원하는 기능
 
 #### 1. 웹 애플리케이션인 경우에 DefaultFormattingConversionSerivce를 상속하여 만든 **WebConversionService**를 빈으로 등록해 준다. 
 
@@ -412,10 +412,22 @@ Event{id=13, title='null'}
 #### 테스트코드 -  `@WebMvcTest()` 슬라이싱 테스트
 
 * (스프링부트 기능)
+
 * 계층형 테스트로 웹과 관련된 빈만 등록해준다.
+
 * 컨트롤러가 주로 등록이 된다.
+
 * Converter나 Formatter가 제대로 등록되지 않으면 테스트가 깨질 수 있다.
+
 * 이런 경우 `@WebMvcTest()` 안에 테스트에 필요한 빈으로 등록을 해줄 수 있다.
+
+* 그냥 클래스를 빈으로 등록해주지 않는다. ComponentScan이 가능한 클래스여야 한다.
+
+  ex) @Component, @Controller
+
+* 빈으로 등록되어야 컨버터 기능이 동작한다.
+
+* 테스트에 필요한 빈들을 명시적으로 표시해주는 것도 좋다고 봄
 
 
 
@@ -442,4 +454,46 @@ public class EventControllerTest {
   ...
 }
 ```
+
+
+
+#### 등록되어있는 컨버터를 보는 방법
+
+```java
+@Component
+public class AppRunner implements ApplicationRunner {
+
+    @Autowired
+    ConversionService conversionService;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        //등록되어있는 컨버터 출력
+        System.out.println(conversionService);
+    }
+}
+```
+
+```
+	@org.springframework.format.annotation.DateTimeFormat java.lang.Long -> java.lang.String: org.springframework.format.datetime.DateTimeFormatAnnotationFormatterFactory@21ae6e73,@org.springframework.format.annotation.NumberFormat java.lang.Long -> java.lang.String: org.springframework.format.number.NumberFormatAnnotationFormatterFactory@d4602a
+	
+	java.lang.Boolean -> java.lang.String : org.springframework.core.convert.support.ObjectToStringConverter@3dedb4a6
+	java.lang.Character -> java.lang.Number : org.springframework.core.convert.support.CharacterToNumberFactory@67fe380b
+	java.lang.Character -> java.lang.String : org.springframework.core.convert.support.ObjectToStringConverter@55f45b92
+	java.lang.Enum -> java.lang.Integer : org.springframework.core.convert.support.EnumToIntegerConverter@49d98dc5
+	java.lang.String -> java.util.TimeZone : org.springframework.core.convert.support.StringToTimeZoneConverter@74a195a4
+	...
+```
+
+
+
+---
+
+Formatter를 사용하는 방식을 추천한다.
+
+이런 데이터 바인딩을 만들 때, 보통 웹과 관련해서 만들기 때문이다.
+
+아니면 컨버터를 써도 상관은 없다. String → XXX 과 같은 형변환
+
+그런데JPA와 관련해서 쓴다면 Entity들은 이미 컨버터가 들어있다.
 

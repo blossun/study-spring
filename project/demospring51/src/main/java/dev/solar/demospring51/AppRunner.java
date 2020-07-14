@@ -14,6 +14,8 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        //등록되어있는 컨버터 출력
+        System.out.println(conversionService);
         System.out.println(conversionService.getClass().toString());
     }
 }
