@@ -436,6 +436,10 @@ EventFormatter를 빈으로 등록해서 테스트하기 때문에 테스트에 
 ※ [실습] 2 - Converter 테스트
 
 ```java
-
+@RunWith(SpringRunner.class)
+@WebMvcTest({EventConverter.StringToEventConverter.class, EventController.class})
+public class EventControllerTest {
+  ...
+}
 ```
 
