@@ -182,17 +182,114 @@ true
 
 * 레퍼런스 참고
 
+---
+
+## SpEL 기능이 쓰이는 곳
+
+* @Value 애노테이션
+* @ConditionalOnExpression 애노테이션
+*  [스프링 시큐리티](https://docs.spring.io/spring-security/site/docs/3.0.x/reference/el-access.html)
+  * 메소드 시큐리티, @PreAuthorize, @PostAuthorize, @PreFilter, @PostFilter
+  * XML 인터셉터 URL 설정
+*  [스프링 데이터](https://spring.io/blog/2014/07/15/spel-support-in-spring-data-jpa-query-definitions)
+  		○ @Query 애노테이션
+*  [Thymeleaf](https://blog.outsider.ne.kr/997)
 
 
-## 이러한 SpEL 기능이 쓰이는 곳
+
+#### @ConditionalOnExpression
+
+@ConditionalOn 어노테이션은 선택적으로 빈을 등록하거나 빈설정파일을 읽어들일 때 사용
+
+SpEL을 기반으로 선별적으로 빈을 등록할 수 있다.
 
 
 
+#### 스프링 시큐리티
+
+xml의 경우 `hasRole()`, `hasIpAddress()`로 사용할 수 있다.
+
+ `hasRole()`, `hasIpAddress()`함수들은 `EvaluationContext`에서 오는 것이다. 
+
+EvaluationContext로 빈을 만들어주면 해당 빈이 제공하는 함수들을 쓸 수 있다.
+
+```xml
+<http use-expressions="true">
+  <intercept-url pattern="/admin*"
+                 access="hasRole('admin') and hasIpAddress('192.168.1.0/24')"/>
+  ...
+</http>
+```
+
+`@PreAuthorize` 어노테이션으로 쓸 수 있다.
+
+```java
+@PreAuthorize("hasRole('ROLE_USER')")
+public void create(Contact contact);
+```
 
 
 
+#### 스프링 데이터
+
+`@Query` 어노테이션
+
+파라미터 값을 메서드 인자로 받은 도메인의 필드 값을 참고해서 쓸 수 있다.
+
+```java
+@Query("select u from User u where u.firstname = :#{#customer.firstname}")
+List<User> findUsersByCustomersFirstname(@Param("customer") Customer customer);
+```
 
 
 
+인덱스(위치)기반으로도 사용 가능
 
+```java
+@Query("select u from User u where u.age = ?#{[0]}")
+List<User> findUsersByAge(int age);
+```
+
+
+
+SpEL의 가장 일반적인 시나리오는 보안 제한 조건의 정의입니다. 따라서 현재 인증 된 사용자와 관련된 결과 만 반환하도록 쿼리를 제한 할 수 있다면 좋을 것입니다
+
+```java
+@Query("select u from User u where u.emailAddress = ?#{principal.emailAddress}")
+List<User> findCurrentUserWithCustomQuery();
+```
+
+---
+
+## ExpressionParser
+
+필요하다면 ExpressionParser를 코딩으로 사용할 수 있다.
+
+`parser.parseExpression()`가 이미 표현식이므로 인자값으로 `#{}`안의 내용만 넣어주면 된다. 
+
+```java
+@Component
+public class AppRunner implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        ExpressionParser parser = new SpelExpressionParser();
+        Expression expression = parser.parseExpression("2 + 100"); //표현식 정의
+        Integer value = expression.getValue(Integer.class);//표현식으로 가져올 데이터 타입
+        System.out.println("value = " + value);
+    }
+}
+```
+
+```
+value = 102
+```
+
+
+
+SpEL도 해당하는 타입으로 형변환을 위해 `ConversionService`을 사용하는 것이다.
+
+```java
+Integer value = expression.getValue(Integer.class);
+```
 

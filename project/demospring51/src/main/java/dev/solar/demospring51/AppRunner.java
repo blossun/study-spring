@@ -3,6 +3,9 @@ package dev.solar.demospring51;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,5 +46,10 @@ public class AppRunner implements ApplicationRunner {
         System.out.println(isMyValue100);
         System.out.println(text);
         System.out.println(sampleData);
+
+        ExpressionParser parser = new SpelExpressionParser();
+        Expression expression = parser.parseExpression("2 + 100"); //표현식 정의
+        Integer value = expression.getValue(Integer.class);//표현식으로 가져올 데이터 타입
+        System.out.println(value);
     }
 }
