@@ -374,7 +374,7 @@ public class EventConverter {
 }
 ```
 
-실행 후, 브라우저에서 URL 접속
+애플리케이션 실행 후, 브라우저에서 URL 접속
 
 ![url접속확인](https://i.imgur.com/kNhwPiM.png)
 
@@ -382,13 +382,60 @@ public class EventConverter {
 
 Converter는 빈으로 등록하지 않음
 
+```java
+@Component //빈으로 등록
+public class EventFormatter implements Formatter<Event> {
+
+    @Override
+    public Event parse(String text, Locale locale) throws ParseException {
+        return new Event(Integer.parseInt(text));
+    }
+
+    @Override
+    public String print(Event object, Locale locale) {
+        return object.getId().toString();
+    }
+}
+```
+
+애플리케이션 실행 후, 브라우저에서 URL 접속
+
+```
+2020-07-14 14:41:50.428  INFO 71308 --- [           main] d.s.d.Demospring51Application            : Started Demospring51Application in 2.052 seconds (JVM running for 2.517)
+class org.springframework.boot.autoconfigure.web.format.WebConversionService
+...
+Event{id=13, title='null'}
+```
+
+![포메터등록](https://i.imgur.com/PCx00Fr.png)
+
+#### 테스트코드 -  `@WebMvcTest()` 슬라이싱 테스트
+
+* (스프링부트 기능)
+* 계층형 테스트로 웹과 관련된 빈만 등록해준다.
+* 컨트롤러가 주로 등록이 된다.
+* Converter나 Formatter가 제대로 등록되지 않으면 테스트가 깨질 수 있다.
+* 이런 경우 `@WebMvcTest()` 안에 테스트에 필요한 빈으로 등록을 해줄 수 있다.
 
 
 
+※ [실습] 1 - Formatter 테스트
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest({EventFormatter.class, EventController.class}) //<-- 추가
+public class EventControllerTest {
+  ...
+}
+```
+
+EventFormatter를 빈으로 등록해서 테스트하기 때문에 테스트에 통과한다.
 
 
 
+※ [실습] 2 - Converter 테스트
 
+```java
 
-
+```
 
