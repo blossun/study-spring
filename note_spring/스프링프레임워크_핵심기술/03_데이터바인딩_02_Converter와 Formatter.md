@@ -42,9 +42,9 @@ public class EventFormatter implements Formatter<Event> {
 	● 실제 변환 작업은 이 인터페이스를 통해서 쓰레드-세이프하게 사용할 수 있음.
 	● **스프링 MVC**, 빈 (value) 설정, SpEL에서 사용한다.
 	● DefaultFormattingConversionService
-	● FormatterRegistry
-	● ConversionService
-	● 여러 기본 컴버터와 포매터 등록 해 줌.
+			● FormatterRegistry
+			● ConversionService
+			● 여러 기본 컴버터와 포매터 등록 해 줌.
 
 
 
@@ -69,7 +69,7 @@ Property가 가지고있던 상태정보를 Converter는 가지고 있지 않다
 
 source와 target을 매개변수로 Converter를 구현하면 된다. 
 
-converter라는 메서드만 구현해주면 된다.
+`converter()`라는 메서드만 구현해주면 된다.
 
 앞서 만든 PropertyEditor와 같은 기능을 한다. 단지, 상태정보가 없기 때문에 얼마든지 빈으로 등록해서 사용해도 상관없다.
 
@@ -103,7 +103,7 @@ public class EventConverter {
 ConverterRegistry에 등록해서 사용하면 된다. 우리가 ConverterRegistry를 직접 쓸 일은 거의 없다. 
 
 * 스프링부트없이 스프링 MVC를 쓴다면, WebConfig를 쓴다고 가정
-  Web용 Configuration을 만든 코드에서 `addFormatters()`메서드를 오버라이딩해서 `registry.addConverter`로 컨버터를 레지스터리에 등록해서 사용하면 된다.
+  Web용 Configuration을 만든 코드에서 `addFormatters()`메서드를 오버라이딩해서 `registry.addConverter(등록할 컨버터)`로 컨버터를 레지스터리에 등록해서 사용하면 된다.
 
   ```java
   @Configuration
@@ -111,7 +111,7 @@ ConverterRegistry에 등록해서 사용하면 된다. 우리가 ConverterRegist
 
       @Override
       public void addFormatters(FormatterRegistry registry) {
-          registry.addConverter(컨버터 등록); //<--
+          registry.addConverter(new EventConverter.EventToStringConverter()); //<--
       }
   }
   ```
@@ -175,13 +175,71 @@ Integer 타입같은 경우, 기본적으로 등록이 되어있는 컨버터나
 
 스프링이 조금 더 웹에 특화되어있는 인터페이스를 만들어서 제공한다. 
 
+※ PropertyEditor와 다른점은 `Locale` 기반으로 문자열을 제공해줄 수 있다.
+
+#### 1. 컨버터 구현
+
+처리할 타입을 매개변수로 Formatter를 구현하면 된다. 
+
+`parse()`, `print()`라는 메서드만 구현해주면 된다.
+
+* parse() : 문자열 → 객체
+
+* print() : 객자 → 문자열
 
 
 
+1. Thread Safe하기 때문에 빈으로 등록해서 사용한다.
+
+"빈으로 등록할 수 있다"는 의미는 다른 빈을 주입받을 수 있다는 의미도 된다.
+
+예시 ) `MessageSource`를 주입받아서 Locale정보를 써서 메시지를 만들 수 있다.
+
+```java
+@Component //빈으로 만들어도 ok
+public class EventFormatter implements Formatter<Event> {
+
+    @Autowired //빈으로 등록했기때문에 빈을 주입받는 것도 가능
+    MessageSource messageSource;
+
+    @Override
+    public Event parse(String text, Locale locale) throws ParseException {
+        return new Event(Integer.parseInt(text));
+    }
+
+    @Override
+    public String print(Event object, Locale locale) {
+        //객체에서 필요한 메시지코드 추출
+        messageSource.getMessage("title", locale);
+        return object.getId().toString();
+    }
+}
+```
 
 
 
+2. 빈으로 등록하지 않고 사용하는 방식
 
+WebConfig(WebMvcConfigurer 구현체)에서 `registry.addFormatter()`로 포메터를 등록해주면 된다.
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(new EventFormatter());
+    }
+}
+```
+
+( 참고 : 이전에 Converter를 빈으로 등록한 것 삭제 후, Formatter만 빈으로 등록해서 실행)
+
+테스트 성공
+
+```
+Event{id=1, title='null'}
+```
 
 
 
