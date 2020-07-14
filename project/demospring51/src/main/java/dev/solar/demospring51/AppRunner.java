@@ -20,6 +20,18 @@ public class AppRunner implements ApplicationRunner {
     @Value("haha")
     String haha;
 
+    @Value("${my.value}") //프로퍼티 사용
+    int myValue;
+
+    @Value("#{${my.value} eq 100}") //표현식 내에서 프로퍼티를 감싸서 가지고 있는 것은 가능
+    boolean isMyValue100;
+
+    @Value("#{'문자열 그대로'}")
+    String text;
+
+    @Value("#{sample.data}")
+    int sampleData;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         System.out.println("================= ");
@@ -27,5 +39,9 @@ public class AppRunner implements ApplicationRunner {
         System.out.println(greeting);
         System.out.println(trueOrFalse);
         System.out.println(haha);
+        System.out.println(myValue);
+        System.out.println(isMyValue100);
+        System.out.println(text);
+        System.out.println(sampleData);
     }
 }
