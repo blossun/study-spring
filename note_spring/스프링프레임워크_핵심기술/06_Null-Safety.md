@@ -94,5 +94,38 @@ public class AppRunner implements ApplicationRunner {
 
 ## @NonNullApi
 
+* 패키지 레벨 설정
+
+* 패키지에 `package-info.java` 파일 생성
+
+```java
+@NonNullApi //<-- 애노테이션 추가
+package dev.solar.demospring51;
+
+import org.springframework.lang.NonNullApi;
+```
+
+
+
+패키지 이하에 있는 모든 파라미터와 리턴값에 @NonNull을 적용하는 것과 같다.
+
+기본값으로 모든 곳에 @NonNull을 적용하고, null을 허용하는 곳에만 선택적으로 @Nullable을 붙일 수 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
