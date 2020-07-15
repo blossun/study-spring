@@ -5,4 +5,6 @@ public interface EventService { //Interface Subject
     void createEvent();
 
     void publishEvent();
+
+    void deleteEvent();
 }

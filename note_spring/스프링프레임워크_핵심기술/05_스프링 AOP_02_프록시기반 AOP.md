@@ -42,73 +42,73 @@
 
 **※ [실습]**
 
-1. <interface>  Subject 생성
+#### 1. <interface>  Subject 생성
 
-   * EventServcie 인터페이스 생성
+* EventServcie 인터페이스 생성
 
-   ```java
-   public interface EventService { //Interface Subject
-       void createEvent();
-       void publishEvent();
-   }
-   ```
+```java
+public interface EventService { //Interface Subject
+    void createEvent();
+    void publishEvent();
+}
+```
 
-   
 
-2. Real Subject 생성
 
-   * EventServcie 인터페이스 구현체인 SimpleEventService 생성
+#### 2. Real Subject 생성
 
-   사용하기 위해서 빈으로 등록
+* EventServcie 인터페이스 구현체인 SimpleEventService 생성
 
-   ```java
-   @Service
-   public class SimpleEventService implements EventService{ //Real Subject
-       @Override
-       public void createEvent() {
-           try {
-               Thread.sleep(1000);
-           } catch (InterruptedException e) {
-               e.printStackTrace();
-           }
-           System.out.println("Created an event");
-       }
-   
-       @Override
-       public void publishEvent() {
-           try {
-               Thread.sleep(2000);
-           } catch (InterruptedException e) {
-               e.printStackTrace();
-           }
-           System.out.println("Published an event");
-       }
-   }
-   ```
+사용하기 위해서 빈으로 등록
 
-   
+```java
+@Service
+public class SimpleEventService implements EventService{ //Real Subject
+    @Override
+    public void createEvent() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Created an event");
+    }
 
-3. Client 코드 구현
+    @Override
+    public void publishEvent() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Published an event");
+    }
+}
+```
 
-   * AppRunner로 프록시 패턴 사용
 
-   ★ 인터페이스를 사용하는 경우에는 `인터페이스 타입으로 주입`받는 것을 권장한다. ★
 
-   ```java
-   @Component
-   public class AppRunner implements ApplicationRunner { //Client
-       @Autowired
-       EventService eventService;
-   
-       @Override
-       public void run(ApplicationArguments args) throws Exception {
-           eventService.createEvent();
-           eventService.publishEvent();
-       }
-   }
-   ```
+#### 3. Client 코드 구현
 
-   
+* AppRunner로 프록시 패턴 사용
+
+★ 인터페이스를 사용하는 경우에는 `인터페이스 타입으로 주입`받는 것을 권장한다. ★
+
+```java
+@Component
+public class AppRunner implements ApplicationRunner { //Client
+    @Autowired
+    EventService eventService;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        eventService.createEvent();
+        eventService.publishEvent();
+    }
+}
+```
+
+
 
 실행결과
 
@@ -117,6 +117,72 @@
 Created an event
 Published an event
 ```
+
+
+
+#### 4. 프록시 적용
+
+* Real Subject와 Client 코드를 수정하지 않고 Real Subject의 createEvent(), publishEvent() 메서드(deleteEvent() 제외)의 실행시간을 측정하는 기능 추가
+
+
+
+##### ※ Crosscutting Concerns (흩어진 관심사)
+
+Real Subject의 메서드에서 직접 실행시간을 측정하는 코드를 추가할 수 있다.
+
+```java
+@Service
+public class SimpleEventService implements EventService{ //Real Subject
+    @Override
+    public void createEvent() {
+        long begin = System.currentTimeMillis(); // <-- 중복 코드(1) 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Created an event");
+
+        System.out.println("수행시간 : " + (System.currentTimeMillis() - begin)); // <-- 중복 코드(2)
+    }
+
+    @Override
+    public void publishEvent() {
+        long begin = System.currentTimeMillis(); // <-- 중복 코드(1)
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Published an event");
+
+        System.out.println("수행시간 : " + (System.currentTimeMillis() - begin)); // <-- 중복 코드(2)
+    }
+}
+```
+
+```
+Created an event
+수행시간 : 1004
+Published an event
+수행시간 : 2004
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
