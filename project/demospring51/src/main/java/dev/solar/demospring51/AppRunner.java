@@ -12,6 +12,6 @@ public class AppRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        String message = eventService.createEvent(null);
+        String message = eventService.createEvent("Solar");
     }
 }
