@@ -24,7 +24,7 @@
 			○ CGlib은 클래스 기반 프록시도 지원.
 	● 스프링 IoC: 기존 빈을 대체하는 동적 프록시 빈을 만들어 등록 시켜준다.
 			○ 클라이언트 코드 변경 없음.
-			○ AbstractAutoProxyCreator implements BeanPostProcessor
+			○ [AbstractAutoProxyCreator](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/aop/framework/autoproxy/AbstractAutoProxyCreator.html) implements [BeanPostProcessor](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/beans/factory/config/BeanPostProcessor.html)
 
 ---
 
@@ -296,19 +296,54 @@ public class Demospring51Application {
 
 * 프록시 클래스 내에서도 중복코드가 생긴다.
 
+* 이러한 프록시 클래스를 만드는데 드는 비용이 적지 않다. 기본 메서드를 위임(delegation)해줘야한다.
+
+* 프록시에서 추가한 기능(메서드 수행 시간 측정 기능)을 (EventService가 아닌) 다른 클래스에도 적용해줘야 한다면?
+
+  적용 대상 클래스마다 프록시 클래스를 모두 만들고, 그 프록시에 중복된 코드를 심어야 하는 거 아닌가.... 비효율적
+
+* 줄일 수 있는 방법
+
+  * ----- 개선 ---→  다이나믹 프록시 적용 -----개선 ---→ 스프링의 Auto Proxy 팩토리빈 적용 ---- 개선 ---→ 스프링 AOP
+  * (이부분 너무 깊이있게 들어가지 않고 말로만 설명)
 
 
 
+프록시를 클래스로 만들어서 컴파일해서 썼다. 동적으로 프록시 객체를 만드는 방법이 있다.
+
+여기서 `동적`은 런타임 즉, 애플리케이션이 동작하는 중에 동적으로 어떤 객체를 감싸는 프록시 객체를 만드는 방법이 있다.
+
+그 방법을 기반으로 스프링 IoC 컨테이너가 제공하는 방법과 혼합해서 사용해서 이 문제를 심플하게 해결한다.
+
+"프록시를 클래스마다 만들어야된다.", "프록시내에 중복코드 발생"이라는 단점들을 해결한다. 이것이 스프링 AOP이다.
 
 
 
+## 스프링 AOP
+
+* 스프링 IoC 컨테이너가 제공하는 기반 시설과 Dynamic 프록시를 사용하여 여러 복잡한 문제 해결.
+* 동적 프록시: 동적으로 프록시 객체 생성하는 방법
+  * 자바가 제공하는 방법은 인터페이스 기반 프록시 생성.
+  * CGlib은 클래스 기반 프록시도 지원.
+* 스프링 IoC: 기존 빈을 대체하는 동적 프록시 빈을 만들어 등록 시켜준다.
+  * 클라이언트 코드 변경 없음.
+  * [AbstractAutoProxyCreator](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/aop/framework/autoproxy/AbstractAutoProxyCreator.html) implements [BeanPostProcessor](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/beans/factory/config/BeanPostProcessor.html)
 
 
 
+스프링 IoC에는 `BeanPostProcessor`가 있다. 어떤 빈이 등록이 되면 그 빈을 가공할 수 있는 라이프사이클 인터페이스이다.
+
+이 경우 스프링 AOP가 적용되는 로직은 SimpleEventService가 빈으로 등록이 되면 스프링이 `AbstractAutoProxyCreator`라는 
+
+`BeanPostProcessor`로 이 SimpleEventService라는 빈을 감싸는 프록시빈을 생성해서 그 빈을 SimpleEventService빈 대신에 등록해준다.
+
+깊이있는 공부를 하고 싶다면, 토비의 스프링3에 자세히 설명되어있다.
 
 
 
+**※ BeanPostProcessor**
 
+새로운 빈 인스턴스를 조작할 수 있는 기능 제공
 
-
+[참고](/Users/ssun/Develop/Project/SpringProjects/study-spring/note_spring/스프링프레임워크_핵심기술/01_IoC 컨테이너와 빈_04.md)
 
