@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class PerAspect {
 
-    @Around("execution(* dev.solar..*.EventService.*(..))")
+    @Around("@annotation(PerLogging)")
     public Object logPerf(ProceedingJoinPoint pjp) throws Throwable {
         long begin = System.currentTimeMillis();
         Object retVal = pjp.proceed(); //메서드 실행

@@ -87,7 +87,7 @@ public Object logPerf(ProceedingJoinPoint pjp) throws Throwable {
 
 
 
-#### 4. 포인트컷 정의
+## 포인트컷 정의 - (1) execution으로 포인트컷 정의
 
 * 정의한 Advice를 어떻게 적용할 것인지 어노테이션으로 지정
 * value값으로 포인트컷을 직접 주거나 포인트컷을 정의할 수 있다.
@@ -155,7 +155,7 @@ Deleted an event
 
 
 
-#### 5. Aspect 대상 지정
+## 포인트컷 정의 - (2) @annotation 으로 포인트컷 정의
 
 * 적용대상을 쉽게 바뀔 수 있다.
 
@@ -167,19 +167,117 @@ ex) 이 패키지의 모든 클래스의 모든 메서드에 적용
 
 
 
-* EventService.deleteEvent() 메서드에는 적용하고 싶지 않다면?
+> EventService.deleteEvent() 메서드에는 적용하고 싶지 않다면?
 
-  
+`execution`보다 애노테이션으로 적용하면 편리하다.
 
-
-
-
+애노테이션으로 적용하기 위해서는 약간의 코드 변경 필요
 
 
 
+#### 1. 애노테이션 생성
+
+*  `@Retention`
+
+★ 주의사항 ★
+
+* RetentionPolicy를 줄때, `CLASS`이상으로 지정해야 한다.
+* 기본값이 CLASS이므로 따로 지정하지 않고 사용해도 괜찮지만, 잘 모를 수 있기 때문에 명시적으로 써주는 것도 좋음
+* RetentionPolicy
+  * 이 애노테이션 정보를 얼마나 유지할 것인가.
+  * default 설정 - CLASS
+  * CLASS
+    * class 파일까지 유지하겠다.
+    * 즉, 컴파일하여 나온 `.class`파일에도 이 애노테이션 정보가 남아있다는 의미
+  * SOURCE
+    * 컴파일하고 나면 사라진다.
+  * RUNTIME
+    * (지금 굳이 runtime까지 유지할 필요는 없음)
 
 
 
+*  `@Target` : Pointcut 대상 정도는 알려줘도 좋다.
+
+*  `@Documented`  : Java Doc 문서를 만들 때 Doc이 되도록 어노테이션 추가해도 좋음
+
+```java
+@Documented
+@Target(ElementType.METHOD) //메서드 대상
+@Retention(RetentionPolicy.CLASS)
+public @interface PerLogging { }
+```
+
+
+
+#### 2. 성능을 측정하고자 하는 메서드에 애노테이션 추가
+
+기본적으로 이 애노테이션을 사용하면, 바이트코드까지 남아있게 된다.
+
+```java
+@PerLogging // <-- 추가
+@Override
+public void createEvent() { ... }
+
+@PerLogging // <-- 추가
+@Override
+public void publishEvent() { ... }
+```
+
+
+
+#### 3. Aspect에 Pointcut 정의
+
+* `@annotation()`
+
+ex ) `PerLogging` 애노테이션이 붙어있는 메서드를 대상으로 이 Advice를 적용해라
+
+```java
+@Around("@annotation(PerLogging)")
+```
+
+
+
+실행 결과
+
+⇒ createEvent()와 publishEvent()에는 적용되고, deleteEvent()에는 적용되지 않아서 수행시간이 출력되지 않는다.
+
+```
+Created an event
+수행시간 : 1013
+Published an event
+수행시간 : 2004
+Deleted an event
+```
+
+
+
+### @annotation 방식 장점
+
+* execution은 포인트컷 조합 (&&, ||, !)을 할 수는 있지만 불편
+  * execution 어드바이스를 2개 만들고, 중복되는 코드를 extract 메서드로 빼내는 방법
+* 대상이 여러 곳에 흩어질 때는 각 대상에 애노테이션을 붙이는 것이 편리하다.
+* IDE 툴의 지원을 받아서 어떤 Advice가 적용되는지 알 수 있지만, 툴의 지원을 못받는 경우 애노테이션을 통해서 Advice를 짐작할 수 있기 때문
+
+```java
+/*
+ * 이 애노테이션을 사용하면 성능을 로깅해줍니다.
+ */
+@Documented
+@Target(ElementType.METHOD) //메서드 대상
+@Retention(RetentionPolicy.CLASS)
+public @interface PerLogging {
+}
+```
+
+
+
+## 포인트컷 정의 - (3) bean
+
+* 지정한 bean이 가지고 있는 모든 public 메서드에 적용된다.
+
+```java
+
+```
 
 
 
