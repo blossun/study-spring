@@ -40,6 +40,8 @@
 
 
 
+## 기존 코드를 건드리지 않고 성능을 측정해 보자. (프록시 패턴으로)
+
 **※ [실습]**
 
 #### 1. <interface>  Subject 생성
@@ -265,6 +267,34 @@ Published an event
 실행시간 : 2004
 Deleted an event
 ```
+
+
+
+## 스프링 부트에서 Non 서버 모드로 애플리케이션 실행하기
+
+SpringApplication을 기본적으로 Web Application으로 띄워주는데, Web Application으로 띄우지 않고, 서버 모드가 아닌 그냥 Java main 메서드 실행하듯이 앱을 실행시키도록 코드 수정
+
+→ 이전 프로젝트 모두 이런 방식으로 실행시키는 것이 이상적이다. 굳이 웹서를 띄울 필요가 없기 때문에...!  속도가 더 빠름
+
+```java
+@SpringBootApplication
+public class Demospring51Application {
+
+    public static void main(String[] args) {
+        //Web Application으로 실행하지 않고, Java main 메서드 실행시킴 (서버 모드 OFF)
+        SpringApplication app = new SpringApplication(Demospring51Application.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
+        app.run(args);
+//        SpringApplication.run(Demospring51Application.class, args);
+    }
+}
+```
+
+
+
+## 프록시 적용 코드 문제점
+
+* 프록시 클래스 내에서도 중복코드가 생긴다.
 
 
 
