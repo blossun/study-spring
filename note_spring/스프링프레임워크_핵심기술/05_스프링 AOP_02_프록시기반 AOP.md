@@ -76,12 +76,17 @@ public class SimpleEventService implements EventService{ //Real Subject
 
     @Override
     public void publishEvent() {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Published an event");
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      System.out.println("Published an event");
+    }
+
+    @Override
+    public void deleteEvent() {
+      System.out.println("Deleted an event");
     }
 }
 ```
@@ -104,11 +109,10 @@ public class AppRunner implements ApplicationRunner { //Client
     public void run(ApplicationArguments args) throws Exception {
         eventService.createEvent();
         eventService.publishEvent();
+        eventService.deleteEvent();
     }
 }
 ```
-
-
 
 실행결과
 
@@ -116,17 +120,12 @@ public class AppRunner implements ApplicationRunner { //Client
 2020-07-15 12:20:23.992  INFO 28893 --- [           main] d.s.d.Demospring51Application            : Started Demospring51Application in 2.25 seconds (JVM running for 2.939)
 Created an event
 Published an event
+Deleted an event
 ```
 
 
 
-#### 4. 프록시 적용
-
-* Real Subject와 Client 코드를 수정하지 않고 Real Subject의 createEvent(), publishEvent() 메서드(deleteEvent() 제외)의 실행시간을 측정하는 기능 추가
-
-
-
-##### ※ Crosscutting Concerns (흩어진 관심사)
+#### 4. Crosscutting Concerns (흩어진 관심사) 코드 추가
 
 Real Subject의 메서드에서 직접 실행시간을 측정하는 코드를 추가할 수 있다.
 
@@ -158,6 +157,12 @@ public class SimpleEventService implements EventService{ //Real Subject
 
         System.out.println("수행시간 : " + (System.currentTimeMillis() - begin)); // <-- 중복 코드(2)
     }
+  
+    // Aspect 적용 제외 대상
+    @Override
+    public void deleteEvent() {
+        System.out.println("Deleted an event");
+    }
 }
 ```
 
@@ -166,21 +171,100 @@ Created an event
 수행시간 : 1004
 Published an event
 수행시간 : 2004
+Deleted an event
 ```
 
 
 
+#### 5. 프록시 적용
+
+* Real Subject와 Client 코드를 수정하지 않고 Real Subject의 createEvent(), publishEvent() 메서드(deleteEvent() 제외)의 실행시간을 측정하는 기능 추가
+
+(1) Proxy 클래스 생성
+
+* 클래스의 타입이 Subject와 동일해야 한다. 즉 같은 인터페이스를 구현해야 한다.
+
+* `@Autowired`로 빈 등록
+
+* `@Primary` 빈으로 등록. 동일한 타입의 빈이 다수개 있다면 우선순위가 높도록 지정
+
+* (이론적으로는) `인터페이스 타입의 빈`을 주입받는 것을 권장하지만,
+
+  프록시 같은 경우는 `Real Subject`빈을 주입받아서 사용해야한다.
+
+  ```java
+  // 방법1. 타입을 명시적으로 선언
+  @Autowired
+  SimpleEventService simpleEventService;
+  // 방법2. 빈의 이름을 기반으로 해서 SimpleEventService 타입을 주입받음
+  @Autowired
+  EventService simpleEventService;
+  ```
+
+  
+
+* 기본 동작코드는 위임(Delegation) 하도록 한다.
+
+```java
+@Primary
+@Service
+public class ProxySimpleEventService implements EventService{
+
+    @Autowired
+    SimpleEventService simpleEventService; // 방법1. 타입을 명시적으로 선언
+//    EventService simpleEventService; // 방법2. 빈의 이름을 기반으로 해서 SimpleEventService 타입을 주입받음
+
+    @Override
+    public void createEvent() {
+        long begin = System.currentTimeMillis();
+        simpleEventService.createEvent(); //Delegate
+        System.out.println("실행시간 : " + (System.currentTimeMillis() - begin));
+    }
+
+    @Override
+    public void publishEvent() {
+        long begin = System.currentTimeMillis();
+        simpleEventService.publishEvent(); //Delegate
+        System.out.println("실행시간 : " + (System.currentTimeMillis() - begin));
+    }
+
+    @Override
+    public void deleteEvent() {
+        simpleEventService.deleteEvent();
+    }
+}
+```
 
 
 
+Client에서 EventService를 주입받지만 `ProxySimpleEventService`에 `@Primary`로 우선순위를 높게 지정했기 때문에 프록시빈을 가져다 쓰게 되는 것이다.
+
+```java
+@Component
+public class AppRunner implements ApplicationRunner { //Client
+    @Autowired
+    EventService eventService; //<-- ProxySimpleEventService 빈 주입
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        eventService.createEvent();
+        eventService.publishEvent();
+        eventService.deleteEvent();
+    }
+}
+```
 
 
 
+실행결과
 
-
-
-
-
+```
+Created an event
+실행시간 : 1003
+Published an event
+실행시간 : 2004
+Deleted an event
+```
 
 
 
