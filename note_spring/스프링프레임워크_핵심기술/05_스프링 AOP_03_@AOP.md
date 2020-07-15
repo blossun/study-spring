@@ -122,6 +122,8 @@ public Object logPerf(ProceedingJoinPoint pjp) throws Throwable {
   * 메서드를 감싸는 형태로 적용된다.
   * 그 메서드 호출 자체를 로직으로 감싸고 있기 때문에, 해당 메서드 호출 전/후에 로직을 처리할 수 있다.
   * 해당 메서드 호출 시 발생한 에러를 잡아서 에러 발생 시 특정 로직을 수행하게 할 수 있다.
+* @Before
+  * 메서드가 실행되기 전에 적용
 
 
 
@@ -276,10 +278,43 @@ public @interface PerLogging {
 * 지정한 bean이 가지고 있는 모든 public 메서드에 적용된다.
 
 ```java
+@Around("bean(simpleEventService)")
+public Object logPerf(ProceedingJoinPoint pjp) throws Throwable { ... }
+```
 
+```
+Created an event
+수행시간 : 1013
+Published an event
+수행시간 : 2004
+Deleted an event
+수행시간 : 0
 ```
 
 
+
+* @Before
+
+  메서드 실행 전에 hello 출력
+
+```java
+@Before("bean(simpleEventService)")
+public void hello() {
+  System.out.println("hello");
+}
+```
+
+```
+hello
+Created an event
+수행시간 : 1014
+hello
+Published an event
+수행시간 : 2003
+hello
+Deleted an event
+수행시간 : 0
+```
 
 
 
