@@ -1,0 +1,23 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "dev.solar.HolomanProperties",
+      "name": "holoman",
+      "type": "dev.solar.HolomanProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "dev.solar.HolomanProperties",
+      "defaultValue": 0,
+      "name": "holoman.how-long",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "dev.solar.HolomanProperties",
+      "name": "holoman.name",
+      "type": "java.lang.String"
+    }
+  ]
+}
