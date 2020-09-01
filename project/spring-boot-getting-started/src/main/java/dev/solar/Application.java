@@ -15,11 +15,11 @@ public class Application {
         application.run(args);
     }
 
-    @Bean
-    public Holoman holoman() {
-        Holoman holoman = new Holoman();
-        holoman.setName("Solariri");
-        holoman.setHowLong(60);
-        return holoman;
-    }
+//    @Bean
+//    public Holoman holoman() {
+//        Holoman holoman = new Holoman();
+//        holoman.setName("Solariri");
+//        holoman.setHowLong(60);
+//        return holoman;
+//    }
 }
