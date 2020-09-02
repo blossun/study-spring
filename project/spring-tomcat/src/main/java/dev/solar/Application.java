@@ -17,6 +17,7 @@ public class Application {
         Tomcat tomcat = new Tomcat();
         // 2. 포트 설정
         tomcat.setPort(8080);
+        tomcat.getConnector(); // <-- tomcat 9 버전부터 적어줘야함!!!
 
         // 3. 톰캣에 컨텍스트 추가
         Context context = tomcat.addContext("/", "/");
