@@ -34,6 +34,8 @@
 <packaging>war</packaging>
 ```
 
+\- `-DskipTests` : 테스트 스킵하여 패키지 생성
+
 
 
 **mvn install**
