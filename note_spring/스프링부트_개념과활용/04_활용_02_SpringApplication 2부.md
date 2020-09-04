@@ -136,3 +136,39 @@ public class SpringinitApplication {
 
 ![image-20200904172113694](images/image-20200904172113694.png)
 
+
+
+## WebApplicationType 설정
+
+※ **WebApplicationType 3종류**
+
+* `NONE` : (우선순위 3)
+* `REACTIVE` : Spring Web flux[^1] 가 들어있다면, `REACTIVE` 타입으로 동작, (우선순위 2)
+* `SERVLET` : Spring MVC가 들어있다면, 기본적으로 `SERVLET`타입으로 동작, (우선순위 1)
+
+[^1]: Spring  Framwork5에서 새롭게 추가된 모듈이다. **web**-**flux**는 client, server에서 reactive 스타일의 어플리케이션 개발을 도와주는 모듈
+
+
+
+Spring MVC와 Spring Web flux 둘 다 들어있으면, `SERVLET`으로 동작한다. classPath에 둘 다 있는 상황에서 Spring Web flux로 동작하게 하려면 명시적으로 설정해줘야 한다.
+
+* `app.setWebApplicationType(WebApplicationType 종류);`
+
+```java
+@SpringBootApplication
+public class SpringinitApplication {
+
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(SpringinitApplication.class);
+        app.setWebApplicationType(WebApplicationType.REACTIVE); //WebApplicationType 지정
+        app.run(args);
+    }
+}
+```
+
+
+
+
+
+
+
