@@ -1,14 +1,16 @@
 package dev.solar.springinit;
 
-import org.springframework.boot.context.event.ApplicationStartingEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
-public class SampleListener implements ApplicationListener<ApplicationStartingEvent> {
+@Component
+public class SampleListener implements ApplicationListener<ApplicationStartedEvent> {
 
     @Override
-    public void onApplicationEvent(ApplicationStartingEvent applicationStartingEvent) {
+    public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
         System.out.println("========================");
-        System.out.println("Application is Starting");
+        System.out.println("~~~~~ started ~~~~~~~~~~");
         System.out.println("========================");
     }
 }

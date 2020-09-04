@@ -49,7 +49,9 @@ public class SampleListener implements ApplicationListener<ApplicationStartingEv
 
 `applicationStartingEvent` 이벤트가 발생하면 우리가 구현한 `SampleListener` 라는 이벤트 리스너가 실행된다. 리스너를 빈으로 등록하면 등록되어있는 빈 중에 해당하는 이벤트에 대한 리스너를 알아서 실행해준다.
 
-> "이 이벤트가 언제 발생하는 것이냐"가 중요한 기점이 된다.
+
+
+> ★ "이 이벤트가 언제 발생하는 것이냐"가 중요한 기점이 된다. ★ 
 >
 > **"`ApplicationContext`가 만들어 졌는가? 아닌가?"** 를 기준으로 한다.
 
@@ -92,3 +94,45 @@ public class SpringinitApplication {
 #### 2. ApplicationListener 를 생성 - ApplicationContext가 만들어진 후 이벤트
 
 * 리스너 생성 후, 빈으로만 등록해주면 됨
+* `ApplicationStartedEvent`는 `ApplicationContext`가 만들어진 다음에 발생하는 이벤트이다.
+
+(1) 리스너 생성
+
+* `@Component` 어노테이션을 이용해서 빈으로 등록
+
+```java
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SampleListener implements ApplicationListener<ApplicationStartedEvent> {
+
+    @Override
+    public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
+        System.out.println("========================");
+        System.out.println("~~~~~ started ~~~~~~~~~~");
+        System.out.println("========================");
+    }
+}
+```
+
+main 코드
+
+```java
+@SpringBootApplication
+public class SpringinitApplication {
+
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(SpringinitApplication.class);
+        app.run(args);
+    }
+}
+```
+
+
+
+⇒ 실행하면 리스너가 잘 동작해서 어플리케이션이 실행 후 메시지가 출력됨
+
+![image-20200904172113694](images/image-20200904172113694.png)
+
