@@ -238,7 +238,7 @@ java -jar target/spring-application-1-1.0-SNAPSHOT.jar -Dfoo --bar
 
 
 
-#### ApplicationRunner 실습
+#### ApplicationRunner 이용
 
 * `ApplicationArguments` 타입으로 메서드를 만들어 준다.
 * argument가 제공하는 유용한 메서드들이 있기때문에 우리가 low level로 코딩하지 않아도 된다. 
@@ -262,5 +262,39 @@ public class SampleRunner implements ApplicationRunner {
 
 ![image-20200904180604101](images/image-20200904180604101.png)
 
-#### CommandLineRunner
+
+
+#### CommandLineRunner 이용
+
+`ApplicationArguments` 타입으로 받을 수 없다. `ApplicationArguments` 가 제공하는 API를 사용하지 못해서 for문으로 값을 다 찍어보자
+
+```java
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+
+@Component
+@Order(1) //Runner 우선 순위 지정. 낮을수록 높은 우선순위
+public class SampleRunner implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) throws Exception {
+        Arrays.stream(args).forEach(System.out::println);
+    }
+}
+```
+
+![image-20200904181155861](images/image-20200904181155861.png)
+
+⇒ `[Program Argument]` 값만 받는다.
+
+
+
+※ Program Argument를 쓰기위해 ApplicationRunner는 고급진 API를 이용할 수 있지만, CommandLineRunner는 조금 무식한 방법을 써야하므로 ApplicationRunner 방법을 추천
+
+
+
+* ApplicationRunner 가 여러개인 경우 `@Order(n)`으로 먼저 실행될 순서를 지정할 수 있다.
+* 값이 낮을수록 높은 우선순위를 가진다.
 

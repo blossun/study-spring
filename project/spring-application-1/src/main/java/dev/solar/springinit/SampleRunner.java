@@ -1,15 +1,17 @@
 package dev.solar.springinit;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
-public class SampleRunner implements ApplicationRunner {
+@Order(1) //Runner 우선 순위 지정. 낮을수록 높은 우선순위
+public class SampleRunner implements CommandLineRunner {
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        System.out.println("foo : " + args.containsOption("foo"));
-        System.out.println("bar : " + args.containsOption("bar"));
+    public void run(String... args) throws Exception {
+        Arrays.stream(args).forEach(System.out::println);
     }
 }
