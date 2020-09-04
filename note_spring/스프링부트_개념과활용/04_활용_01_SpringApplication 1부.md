@@ -196,7 +196,7 @@ public class SpringinitApplication {
 
 
 
-### SpringApplicationBuilder로 빌더 패턴 사용 가능
+## SpringApplicationBuilder로 빌더 패턴 사용 가능
 
 * Docs - `Fluent Builder API`
 * 빌더 패턴으로 만들어서 커스터 마이징할 수 있다.
