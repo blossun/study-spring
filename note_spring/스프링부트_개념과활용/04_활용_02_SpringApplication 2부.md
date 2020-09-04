@@ -225,5 +225,42 @@ java -jar target/spring-application-1-1.0-SNAPSHOT.jar -Dfoo --bar
 
 
 * argument에는 유용한 메서드들이 있으므로 필요한 경우에 잘 사용하자
+* 우리가 low level로 코딩하지 않아도 된다. `ApplicationArguments`에 대한 추상화된 API를 사용해서 코딩을 할 수 있다.
 
 ![image-20200904175639847](images/image-20200904175639847.png)
+
+
+
+## 애플리케이션 실행한 뒤 뭔가 추가적으로 실행하고 싶을 때
+
+* ApplicationRunner (추천) 또는 CommandLineRunner
+* 순서 지정 가능 @Order
+
+
+
+#### ApplicationRunner 실습
+
+* `ApplicationArguments` 타입으로 메서드를 만들어 준다.
+* argument가 제공하는 유용한 메서드들이 있기때문에 우리가 low level로 코딩하지 않아도 된다. 
+  `ApplicationArguments`에 대한 추상화된 API를 사용해서 코딩을 할 수 있다.
+
+```java
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SampleRunner implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        System.out.println("foo : " + args.containsOption("foo"));
+        System.out.println("bar : " + args.containsOption("bar"));
+    }
+}
+```
+
+![image-20200904180604101](images/image-20200904180604101.png)
+
+#### CommandLineRunner
+
