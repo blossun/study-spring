@@ -168,7 +168,62 @@ public class SpringinitApplication {
 
 
 
+## 애플리케이션 아규먼트 사용하기
+
+※ [실습] Argument를 찍어내는 컴포넌트 생성
 
 
 
+두 가지 값 중 어떤 것이 애플리케이션 아규먼트인지 확인해보기 위해 각각의 값을 입력하고 출력해보자
 
+[어플리케이션 실행 tab] > [Edit Configurations...] >
+
+* [VM options] : `-D`로 들어오는 값
+* [Program Argument] : `--` 로 들어오는 값
+
+![image-20200904174226556](images/image-20200904174226556.png)
+
+
+
+※ 어떠한 빈에 생성자가 한 개이고, 그 생성자에 파라미터가 빈을 경우에는 해당 빈을 스프링이 자동으로 주입해준다.
+
+빈을 생성할 때, 넘겨받은 argument에 값이 들어있는지 출력해보자
+
+```java
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SampleListener {
+
+  public SampleListener(ApplicationArguments arguments) {
+    System.out.println("foo : " + arguments.containsOption("foo"));
+    System.out.println("bar : " + arguments.containsOption("bar"));
+  }
+}
+```
+
+![image-20200904175024121](images/image-20200904175024121.png)
+
+⇒ foo는 없고, bar는 있다.
+
+즉, `VM options`는 `Program Argument`가 아니다.
+
+둘 다 콘솔로 들어오는 것인데, `-D`로 들어오는 것은 `VM options`으로 쓰고, `--`로 들어오는 값은  `[Program Argument]` 값으로 쓴다.
+
+
+
+※ [실습] 콘솔로 Argument를 넣어보자
+
+```sh
+mvn clean package //mvn을 실행하는 위치는 항상 프로젝트의 루트여야 한다.
+java -jar target/spring-application-1-1.0-SNAPSHOT.jar -Dfoo --bar
+```
+
+![image-20200904175452500](images/image-20200904175452500.png)
+
+
+
+* argument에는 유용한 메서드들이 있으므로 필요한 경우에 잘 사용하자
+
+![image-20200904175639847](images/image-20200904175639847.png)
