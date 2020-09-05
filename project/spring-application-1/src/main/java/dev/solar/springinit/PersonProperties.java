@@ -1,7 +1,11 @@
 package dev.solar.springinit;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.convert.DurationUnit;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 @Component
 @ConfigurationProperties("person")
@@ -12,6 +16,17 @@ public class PersonProperties {
     private int age;
 
     private String fullName;
+
+    public Duration getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout(Duration sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+
+    @DurationUnit(ChronoUnit.SECONDS)
+    private Duration sessionTimeout = Duration.ofSeconds(30);
 
     public String getName() {
         return name;
