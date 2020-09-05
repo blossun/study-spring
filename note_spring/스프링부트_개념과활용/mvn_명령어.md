@@ -64,6 +64,8 @@
 
  . 예) mvn package -Dmaven.test.skip=true : 테스트를 건너뛰고 패키징 수행
 
+\- `-DskipTests` 도 테스트 스킵
+
 
 
 **2) mvn -P[profile명] [goals]**
