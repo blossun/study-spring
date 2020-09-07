@@ -19,6 +19,7 @@ public class SampleRunner implements ApplicationRunner {
         System.out.println("=============================");
         System.out.println(hello);
         System.out.println(personProperties.getName());
+        System.out.println(personProperties.getFullName());
         System.out.println("=============================");
     }
 }
