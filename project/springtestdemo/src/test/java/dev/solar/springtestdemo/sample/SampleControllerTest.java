@@ -3,29 +3,22 @@ package dev.solar.springtestdemo.sample;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SampleControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    TestRestTemplate testRestTemplate; //테스트용 TestTemplate
 
     @Test
     public void hello() throws Exception {
-        mockMvc.perform(get("/hello")) // <-- /hello url에 get 요청에 대한 테스트
-                .andExpect(status().isOk()) // <-- response status 값 200 체크
-                .andExpect(content().string("hello Solar")) // <-- response body 값 string으로 체크
-                .andDo(print()); // <-- 요청 정보 출력
+        String result = testRestTemplate.getForObject("/hello", String.class);
+        assertThat(result).isEqualTo("hello Solar");
     }
 }
