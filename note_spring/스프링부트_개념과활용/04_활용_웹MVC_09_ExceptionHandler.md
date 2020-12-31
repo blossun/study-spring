@@ -139,11 +139,27 @@ public class BasicErrorController extends AbstractErrorController {
 
 ## 커스텀 에러 페이지
 
-* 상태 코드 값에 따라 에러 페이지 보여주기
-* src/main/resources/static|template/error/
-* 404.html
-* 5xx.html
-* ErrorViewResolver 구현
+상태 코드 값에 따라 에러 페이지 보여주기
+
+* error 디렉토리 생성
+
+  * resources의 static이나 template 밑에
+  * src/main/resources/static|template/error/
+  * 정적인 에러페이지를 보여주려면 static 디렉토리 하위에 동적인 에러페이지는 template 밑에 만들면 된다.
+
+* html 에러페이지 생성
+
+  * 페이지 이름은 상태코드값과 동일하게 하거나 대표적으로 지을 것
+  * 404.html
+  * 5xx.html
+
+  ![image-20201231170424133](images/image-20201231170424133.png)
+
+
+
+* 좀 더 많은 커스터 마이징을 하고싶다면 `ErrorViewResolver` 구현
+
+  동적인 컨텐츠 뷰로 에러페이지를 만들 때 다양한 커스터마이징 가능. ex) 서버에서 발생한 에러정보를 넣어서 전달 - 보안측면에서 클라이언트는 모르는 게 좋지 않나?
 
 
 
