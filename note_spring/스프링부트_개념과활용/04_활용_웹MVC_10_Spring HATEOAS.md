@@ -165,9 +165,34 @@ ex ) 클라이언트가 리소스를 요청했을 때,  (서버가) 리소스에
 
 ![image-20210101222045410](images/image-20210101222045410.png)
 
+* [git code](https://github.com/blossun/study-spring/commit/4356c0b7aa32a7ba796d3ad46b21aabb56e51241)
+
 
 
 이렇게 관련된 링크 정보들을 리소스에 추가해서 반환하는 식으로 구현하고, 클라이언트도 이 링크 정보를 활용하는 것이 "진정한 RestAPI라면 해야하는" 수준의 고급 API를 만들 수 있는 기능
+
+
+
+## ObjectMapper
+
+* JSON ←→ 객체 변환
+
+* 따로 빈으로 등록할 필요없이 @Autowired로 주입받아서 사용하면 된다.
+
+  ```java
+  @Autowired
+  ObjectMapper objectMapper;
+  ```
+
+* ObjectMapper를 커스터마이징하고 싶다면 `spring.jackson.*` 하위의 것들을 사용하면 된다.
+
+
+
+## LinkDiscovers
+
+* XPath를 확장해서 만든 HATEOAS용 클라이언트 API이다.
+* RestAPI로 다른 쪽 서버 API를 요청해서 응답을 받았는데, 해당 API가 HATEOAS를 지원한다면 (즉, link 정보가 들어있다.) link 정보에서 메서드를 사용해서 self에 해당하는 링크 정보를 가져오는 등... 유틸리티성 클래스를 지원
+* 빈으로 등록되어있기 때문에 주입받아 사용하면 된다.
 
 
 
