@@ -9,6 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,11 +36,11 @@ public class AccountRepositoryTest {
 
         assertThat(newAccount).isNotNull();
 
-        Account existingAccount = accountRepository.findByUsername(newAccount.getUsername());
-        assertThat(existingAccount).isNotNull();
+        Optional<Account> existingAccount = accountRepository.findByUsername(newAccount.getUsername());
+        assertThat(existingAccount).isNotEmpty();
 
-        Account nonExistingAccount = accountRepository.findByUsername("holari");
-        assertThat(nonExistingAccount).isNull();
+        Optional<Account> nonExistingAccount = accountRepository.findByUsername("holari");
+        assertThat(nonExistingAccount).isEmpty();
 
     }
 }
