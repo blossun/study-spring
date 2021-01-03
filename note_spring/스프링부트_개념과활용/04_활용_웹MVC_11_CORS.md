@@ -152,3 +152,22 @@ public class SpringcorsserverApplication {
 
 설정을 모든 메서드마다 할 수 없음. 허용할 컨트롤러에 붙이거나, 여러 컨트롤러에 걸쳐 설정해야 한다면 WebConfig 설정 파일을 만들어서 설정할 수 있다.
 
+모든 컨틀롤러에 글로벌한 적용이 가능
+
+* WebMvcConfigurer 인터페이스를 확장해서 만들기
+
+  SpringBoot가 제공하는 Spring MVC기능을 전부 사용하면서 추가로 기능을 확장할 수 있다.
+
+* CorsRegistry에 허용할 Origin을 등록해주면 된다.
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") //허용할 리소스
+                .allowedOrigins("http://localhost:18080"); //허용할 Origin
+    }
+}
+```
