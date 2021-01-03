@@ -9,12 +9,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
-public class H2Runner implements ApplicationRunner {
-    private static final Logger log = LoggerFactory.getLogger(H2Runner.class);
+public class MySQLRunner implements ApplicationRunner {
+    private static final Logger log = LoggerFactory.getLogger(MySQLRunner.class);
 
     @Autowired
     DataSource dataSource;
@@ -23,9 +21,8 @@ public class H2Runner implements ApplicationRunner {
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        jdbcTemplate.execute("CREATE TABLE user (id INTEGER NOT NULL, name VARCHAR(255), PRIMARY KEY (id));\n" +
-                "INSERT INTO user VALUES (1, 'solar')");
-
+    public void run(ApplicationArguments args) {
+        jdbcTemplate.execute("CREATE TABLE USER (id INTEGER NOT NULL, name VARCHAR(255), PRIMARY KEY (id))");
+        jdbcTemplate.execute("INSERT INTO USER VALUES (1, 'solar')");
     }
 }
