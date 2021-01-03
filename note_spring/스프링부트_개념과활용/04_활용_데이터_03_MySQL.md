@@ -187,5 +187,5 @@ MySQL 라이센스 (GPL) 주의
 docker run -p 3306:3306 --name mariadb_boot -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=springboot -e MYSQL_USER=solar -e MYSQL_PASSWORD=pass -d mariadb
 ```
 
-
+![image-20210103184549088](images/image-20210103184549088.png)
 
