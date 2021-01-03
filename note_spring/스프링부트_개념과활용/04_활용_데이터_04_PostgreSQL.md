@@ -12,7 +12,7 @@
 PostgreSQL 설치 및 서버 실행 (docker)
 
 ```sh
-docker run -p 5432:5432 -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=keesun -e POSTGRES_DB=springboot --name postgres_boot -d postgres
+docker run -p 5432:5432 -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=solar -e POSTGRES_DB=springboot --name postgres_boot -d postgres
 
 docker exec -i -t postgres_boot bash
 

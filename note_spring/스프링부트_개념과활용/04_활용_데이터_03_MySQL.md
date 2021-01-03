@@ -129,7 +129,9 @@ application.properites 에 `spring.datasource.사용할DBCP` 추가
 
 ### 2. MySQL 추가 (도커 사용)
 
-docker run -p 3306:3306 --name {container name} -e MYSQL_ROOT_PASSWORD={root password} -e MYSQL_DATABASE={db name} -e MYSQL_USER={user name} -e MYSQL_PASSWORD={password} -d mysql
+docker run -p 3306:3306 --name {container name} -e MYSQL_ROOT_PASSWORD={root password} -e MYSQL_DATABASE={db name} -e MYSQL_USER={user name} -e MYSQL_PASSWORD={password} -d {이미지이름}
+
+* `-d` : daemon 모 (백그라운드)
 
 ```sh
 # 인스턴스 생성
@@ -182,6 +184,10 @@ MySQL 라이센스 (GPL) 주의
 * 라이센스비를 내고싶지 않은 경우 MySQL 대신 MariaDB 사용 검토
 * 소스 코드 공개 의무 여부 확인 
 * MariaDB : 커뮤니티 버전의 MySQL. GPL이기 때문에 소스코드 공개의무가 있을 수 있다.
+
+
+
+#### MariaDB 서버 띄우기
 
 ```sh
 docker run -p 3306:3306 --name mariadb_boot -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=springboot -e MYSQL_USER=solar -e MYSQL_PASSWORD=pass -d mariadb
