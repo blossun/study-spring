@@ -142,6 +142,12 @@ public class SpringcorsserverApplication {
 
 
 
+⇒ 리소스 요청 성공
+
+![image-20210103130228130](images/image-20210103130228130.png)
+
+
+
 ### 웹 설정 파일로 CORS 지원 설정 추가
 
 설정을 모든 메서드마다 할 수 없음. 허용할 컨트롤러에 붙이거나, 여러 컨트롤러에 걸쳐 설정해야 한다면 WebConfig 설정 파일을 만들어서 설정할 수 있다.
