@@ -24,16 +24,8 @@ public class H2Runner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            // 접속할 DB에 대한 정보 확인
-            log.debug("URL : {}, UserName : {}",
-                    connection.getMetaData().getURL(),
-                    connection.getMetaData().getUserName());
-            Statement statement = connection.createStatement();
-            String sql = "CREATE TABLE user (id INTEGER NOT NULL, name VARCHAR(255), PRIMARY KEY (id));\n" +
-                    "INSERT INTO user VALUES (1, 'solar')";
-            statement.executeUpdate(sql);
-        }
+        jdbcTemplate.execute("CREATE TABLE user (id INTEGER NOT NULL, name VARCHAR(255), PRIMARY KEY (id));\n" +
+                "INSERT INTO user VALUES (1, 'solar')");
 
     }
 }
