@@ -1,10 +1,12 @@
 package dev.solar.springbootsecurity;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,6 +23,7 @@ public class HomeControllerTest {
     MockMvc mockMvc;
 
     @Test
+    @WithMockUser
     public void hello() throws Exception {
         mockMvc.perform(get("/hello")
                     .accept(MediaType.TEXT_HTML))
@@ -30,6 +33,15 @@ public class HomeControllerTest {
     }
 
     @Test
+    @DisplayName("인증정보가 없는 유저의 경우 Unauthorized응답")
+    public void hello_without_user() throws Exception {
+        mockMvc.perform(get("/hello"))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
     public void my() throws Exception {
         mockMvc.perform(get("/my"))
                 .andDo(print())

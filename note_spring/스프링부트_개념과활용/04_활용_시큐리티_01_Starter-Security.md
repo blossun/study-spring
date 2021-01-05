@@ -44,27 +44,9 @@
 
 * Thymleaf로 뷰 렌더링
 
-#### 목표
-
-* /hello : 모든 사용자가 접근 가능
-* /my : 로그인한 사용자만 접근 가능
-
-
-
 ## 실습
 
-1. 스프링 시큐리티 의존성 추가
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
-```
-
-
-
-2. 테스트 코드
+1. 테스트 코드 작성 ⇒ 테스트 성공
 
 ```java
 @Test
@@ -87,7 +69,18 @@ public void my() throws Exception {
 
 
 
-⇒ 시큐리티를 추가하면 테스트가 깨진다.
+2. 스프링 시큐리티 의존성 추가
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+
+
+3. 다시 테스트 코드 실행 ⇒ 시큐리티를 추가하면 테스트가 깨진다.
 
 * "/my" ⇒ 401 Unauthorized 응답 : *"Basic 인증"*
 
@@ -219,6 +212,8 @@ DefaultAuthenticationEventPublisher 는 SpringBootWebSecurityConfiguration 을 i
 
 ※ SecurityAutoConfiguration 자동설정을 쓰지않고 다음과 같이 직접 빈을 등록해서 거의 동일한 기능을 사용할 수 있는 우리만의 웹 시큐리티 설정을 사용할 수 있다.
 
+(이렇게 직접 등록할 경우 스프링부트가 제공하는 SecurityAutoConfiguration은 사용되지 않는다.)
+
 ```java
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -253,13 +248,44 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 ## 깨진 테스트 수정
 
+1. 의존성 추가
 
+   ```xml
+   <dependency>
+     <groupId>org.springframework.security</groupId>
+     <artifactId>spring-security-test</artifactId>
+    <!--   <version>${spring-security.version}</version>--> <!--최신 스프링은 버전지원을 해줌 -->
+     <scope>test</scope>
+   </dependency>
+   ```
 
+2. 테스트 마다 `@WithMockUser` 애노테이션을 추가 (또는 클래스에 추가)
 
+   가짜 유저 인증 정보를 추가해서 테스트를 추가해준다.
 
+   ```java
+   @Test
+   @WithMockUser
+   public void hello() throws Exception {
+       mockMvc.perform(get("/hello")
+                   .accept(MediaType.TEXT_HTML))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(view().name("hello"));
+   }
+   
+   @Test
+   @DisplayName("인증정보가 없는 유저의 경우 Unauthorized응답")
+   public void hello_without_user() throws Exception {
+       mockMvc.perform(get("/hello"))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
+   }
+   ```
 
-
-
+* 스프링 부트 시큐리티 테스트가 제공하는 다양한 기능
+  * 특정 유저 정보로 로그인 테스트를 할 수 있다.
+  * https://docs.spring.io/spring-security/site/docs/current/reference/html/test-method.html
 
 
 
