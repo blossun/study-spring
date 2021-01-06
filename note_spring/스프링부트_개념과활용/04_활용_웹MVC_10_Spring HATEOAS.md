@@ -41,6 +41,8 @@ HATEOAS를 구현하는데 편리한 기능을 제공해주는 라이브러리
   * **Rel**ation
   * **H**ypertext **Ref**erence)
 
+![image-20210106184800128](images/image-20210106184800128.png)
+
 
 
 #### HATEOAS 원리
