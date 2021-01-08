@@ -69,7 +69,7 @@ public class EventControllerTests {
             .andExpect(status().isCreated()) // 201 응답코드
             .andExpect(jsonPath("id").exists())
             .andExpect(header().exists(HttpHeaders.LOCATION))
-            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE.concat(";charset=UTF-8")))
             .andExpect(jsonPath("id").value(Matchers.not(100)))
             .andExpect(jsonPath("free").value(Matchers.not(true)))
             .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
@@ -102,6 +102,17 @@ public class EventControllerTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
+    }
+
+    @Test
+    @DisplayName("입력 데이터가 이상한 경우")
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
     }
 
 }
