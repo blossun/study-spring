@@ -1,12 +1,11 @@
 package dev.solar.demoinflearnrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -31,6 +30,17 @@ public class EventControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    private WebApplicationContext ctx;
+
+    @Before
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
+                .alwaysDo(print())
+                .build();
+    }
+
     @Test
     public void createEvent() throws Exception {
         Event event = Event.builder()
@@ -47,14 +57,14 @@ public class EventControllerTests {
                 .build();
 
         mockMvc.perform(post("/api/events/") // 요청
-        .contentType(MediaType.APPLICATION_JSON) // Request body 데이터 형태
-        .accept(MediaTypes.HAL_JSON) // Response 데이터 타입
-        .content(objectMapper.writeValueAsString(event))) // 헤더 정보에 맞게 본문을 JSON으로 변환해서 넘겨줘야한다.
+                .contentType(MediaType.APPLICATION_JSON) // Request body 데이터 형태
+                .accept(MediaTypes.HAL_JSON) // Response 데이터 타입
+                .content(objectMapper.writeValueAsString(event))) // 헤더 정보에 맞게 본문을 JSON으로 변환해서 넘겨줘야한다.
                 .andDo(print()) // http 본문 출력
                 .andExpect(status().isCreated()) // 201 응답코드
-        .andExpect(jsonPath("id").exists())
-        .andExpect(header().exists("Location"))
-        .andExpect(header().string("Content-Type", "application/hal+json"));
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Content-Type", "application/hal+json;charset=UTF-8"));
         ;
     }
 }
