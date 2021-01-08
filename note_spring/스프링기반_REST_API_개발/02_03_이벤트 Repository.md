@@ -106,7 +106,39 @@ public class EventController {
 
 
 
+#### EventRepository Mocking and Stubbing
 
+테스트가 슬라이스 테스트이기 때문에 Web용 빈들만 등록해주지 Repository 빈을 등록해주지 않는다.
+
+Repository를 목킹해서 사용하자. `@MockBean` 애노테이션을 붙이면 해당 빈을 목으로 만들어서 사용할 수 있다.
+
+**@MockBean**
+
+* Mockito를 사용해서 mock 객체를 만들고 빈으로 등록해 줌.
+* (주의) 기존 빈을 테스트용 빈이 대체 한다.
+
+ 
+
+목객체이기 때문에 save()하더라도 (EventController → createEvent()에서 반환하는 newEvent) null값이 반환된다. 
+
+따라서 newEvent.getId()를 하려고 하면 NPE가 발생한다.
+
+이를 해결하기위해 stubbing을 해줘야한다. ex) "save()가 호출될 때 ~~~한 동작을 해라" 하는 설정
+
+```java
+// stubbing
+// evnetRepository의 save()가 호출될 때 할 행동을 정의
+event.setId(10);
+Mockito.when(eventRepository.save(event)).thenReturn(event);
+```
+
+
+
+---
+
+> TDD
+
+* 최소한 3개의 데이터로 테스트를 만들어야함
 
 
 
