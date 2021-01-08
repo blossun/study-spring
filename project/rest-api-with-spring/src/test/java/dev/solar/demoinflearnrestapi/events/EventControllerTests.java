@@ -5,10 +5,9 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,7 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest
+@SpringBootTest
+@AutoConfigureMockMvc
 public class EventControllerTests {
 
     @Autowired
@@ -33,9 +33,6 @@ public class EventControllerTests {
 
     @Autowired
     ObjectMapper objectMapper;
-
-    @MockBean
-    EventRepository eventRepository;
 
     @Autowired
     private WebApplicationContext ctx;
@@ -64,22 +61,20 @@ public class EventControllerTests {
                 .location("강남역 D2 스타텁 팩토리")
                 .free(true) //계산되어야 하는 값
                 .offline(false) //계산되어야 하는 값
+                .eventStatus(EventStatus.PUBLISHED)
                 .build();
-
-        // stubbing
-        // evnetRepository의 save()가 호출될 때 할 행동을 정의
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         mockMvc.perform(post("/api/events/") // 요청
                 .contentType(MediaType.APPLICATION_JSON) // Request body 데이터 형태
                 .accept(MediaTypes.HAL_JSON) // Response 데이터 타입
                 .content(objectMapper.writeValueAsString(event))) // 헤더 정보에 맞게 본문을 JSON으로 변환해서 넘겨줘야한다.
                 .andDo(print()) // http 본문 출력
-                .andExpect(status().isCreated()) // 201 응답코드
-        .andExpect(jsonPath("id").exists())
-        .andExpect(header().exists(HttpHeaders.LOCATION))
-        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE.concat(";charset=UTF-8")))
-        .andExpect(jsonPath("id").value(Matchers.not(100)))
-        .andExpect(jsonPath("free").value(Matchers.not(true)));
+            .andExpect(status().isCreated()) // 201 응답코드
+            .andExpect(jsonPath("id").exists())
+            .andExpect(header().exists(HttpHeaders.LOCATION))
+            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE.concat(";charset=UTF-8")))
+            .andExpect(jsonPath("id").value(Matchers.not(100)))
+            .andExpect(jsonPath("free").value(Matchers.not(true)))
+            .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
     }
 }
