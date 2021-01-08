@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,8 +48,7 @@ public class EventControllerTests {
 
     @Test
     public void createEvent() throws Exception {
-        Event event = Event.builder()
-                .id(100) //셋팅되어서는 안되는 값
+        EventDto event = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2021, 1, 8, 13, 2, 21))
@@ -59,9 +59,6 @@ public class EventControllerTests {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 D2 스타텁 팩토리")
-                .free(true) //계산되어야 하는 값
-                .offline(false) //계산되어야 하는 값
-                .eventStatus(EventStatus.PUBLISHED)
                 .build();
 
         mockMvc.perform(post("/api/events/") // 요청
@@ -72,9 +69,39 @@ public class EventControllerTests {
             .andExpect(status().isCreated()) // 201 응답코드
             .andExpect(jsonPath("id").exists())
             .andExpect(header().exists(HttpHeaders.LOCATION))
-            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE.concat(";charset=UTF-8")))
+            .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
             .andExpect(jsonPath("id").value(Matchers.not(100)))
             .andExpect(jsonPath("free").value(Matchers.not(true)))
             .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
     }
+
+    @Test
+    @DisplayName("입력값 이외에 에러 발생")
+    public void createEvent_Bad_Request() throws Exception {
+        Event event = Event.builder()
+                .id(100)
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 11, 24, 14, 21))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 25, 14, 21))
+                .endEventDateTime(LocalDateTime.of(2018, 11, 26, 14, 21))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+        mockMvc.perform(post("/api/events/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaTypes.HAL_JSON)
+                .content(objectMapper.writeValueAsString(event)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
 }
