@@ -15,10 +15,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
 public class EventController {
 
+    private final EventRepository eventRepository;
+
+    public EventController(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
     @PostMapping()
     public ResponseEntity createEvent(@RequestBody Event event) {
-        URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
-        event.setId(10); //임의의 id 값
-        return ResponseEntity.created(createdUri).body(event);
+        Event newEvent = this.eventRepository.save(event);
+        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri(); // DB에 저장된 ID 값
+        return ResponseEntity.created(createdUri).body(newEvent); //저장된 Event 정보 반환
     }
 }
