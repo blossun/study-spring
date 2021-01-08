@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -24,6 +25,7 @@ public class EventControllerTests {
         mockMvc.perform(post("/api/events/") // 요청
         .contentType(MediaType.APPLICATION_JSON) // Request body 데이터 형태
         .accept(MediaTypes.HAL_JSON)) // Response 데이터 타입
+                .andDo(print()) // http 본문 출력
                 .andExpect(status().isCreated()); // 201 응답코드
     }
 }
