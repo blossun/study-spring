@@ -22,9 +22,12 @@ public class EventController {
 
     private final ModelMapper modelMapper;
 
-    public EventController(EventRepository eventRepository, ModelMapper modelmapper) {
+    private final EventValidator eventValidator;
+
+    public EventController(EventRepository eventRepository, ModelMapper modelmapper, EventValidator eventValidator) {
         this.eventRepository = eventRepository;
         this.modelMapper = modelmapper;
+        this.eventValidator = eventValidator;
     }
 
     @PostMapping()
@@ -32,6 +35,12 @@ public class EventController {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
+
+        eventValidator.validate(eventDto, errors);
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         Event event = modelMapper.map(eventDto, Event.class);
         Event newEvent = this.eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri(); // DB에 저장된 ID 값

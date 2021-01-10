@@ -104,6 +104,7 @@ public class EventControllerTests {
         ;
     }
 
+    // 요청에 맞는 필드를 보내지만 값은 비어있는 경우 Bad Request응답이 와야한다.
     @Test
     @DisplayName("입력 데이터가 이상한 경우")
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
@@ -115,4 +116,28 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+
+    // 비즈니스 로직 상 잘못된 데이터 입력 시 Bad Request
+    // maxPrice는 basePrice보다 높아야함. 시작날짜는 종료날짜보다 먼저여야 한다.
+    @Test
+    @DisplayName("잘못된 데이터 입력 시 Bac Request")
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 26, 14, 21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 11, 25, 14, 21))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 24, 14, 21))
+                .endEventDateTime(LocalDateTime.of(2018, 11, 23, 14, 21))
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
 }
