@@ -2,6 +2,7 @@ package dev.solar.demoinflearnrestapi.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -44,7 +45,12 @@ public class EventController {
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
         Event newEvent = this.eventRepository.save(event);
-        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri(); // DB에 저장된 ID 값
-        return ResponseEntity.created(createdUri).body(newEvent); //저장된 Event 정보 반환
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createdUri = selfLinkBuilder.toUri(); // DB에 저장된 ID 값
+        EventResource eventResource = new EventResource(newEvent);
+        eventResource.add(linkTo(EventController.class).withRel("query-events")); //링크 추가 - 이벤트 조회
+        eventResource.add(selfLinkBuilder.withSelfRel()); //self 링크
+        eventResource.add(selfLinkBuilder.withRel("update-event")); //이벤트 수정(rel) - url은 self와 동일
+        return ResponseEntity.created(createdUri).body(eventResource); //EventResource로 변환해서 전달
     }
 }
