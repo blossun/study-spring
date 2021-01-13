@@ -1,18 +1,11 @@
 package dev.solar.demoinflearnrestapi.events;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 
-public class EventResource extends RepresentationModel {
+public class EventResource extends EntityModel<Event> {
 
-    @JsonUnwrapped
-    private Event event;
-
-    public EventResource(Event event) {
-        this.event = event;
-    }
-
-    public Event getEvent() {
-        return event;
+    public EventResource(Event content, Link ... links) {
+        super(content, links);
     }
 }

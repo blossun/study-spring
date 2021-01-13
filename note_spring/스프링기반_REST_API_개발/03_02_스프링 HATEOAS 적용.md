@@ -96,9 +96,49 @@ EventResource를 ObjectMapper가 Serialization할 때, BeanSerializer를 쓴다.
 
   ![image-20210113205256262](images/image-20210113205256262.png)
 
-
-
 ⇒ event로 감싸지 않고 원하는대로 나온다.
+
+
+
+* 방법 3
+
+`RepresentationModel` 클래스 하위에 `EntityModel`가 있다. `EntityModel`를 쓰면 `content`로 들어가는데, content 게터에 `@JsonUnwrapped`가 붙어있다.
+
+```java
+public class EntityModel<T> extends RepresentationModel<EntityModel<T>> {
+
+   private T content;
+  
+  //...
+  @Nullable
+	@JsonUnwrapped //<- 이미 들어가있음
+	@JsonSerialize(using = MapSuppressingUnwrappingSerializer.class)
+	public T getContent() {
+		return content;
+	}
+}
+```
+
+명시적으로 `@JsonUnwrapped`을 붙이지 않아도 UnWrapping 된다.
+
+```java
+public class EventResource extends EntityModel<Event> {
+
+    public EventResource(Event content, Link ... links) {
+        super(content, links);
+    }
+}
+```
+
+⇒ 빈이 아니므로 빈으로 등록하지 않고, 매번 새로 컨버팅해서 써야하는 객체이다.
+
+
+
+응답의 Content-type이 `application/hal+json`이므로 클라이언트들이 응답의 `_links`필드에 링크정보를 들고있을 것이라고 예상할 수 있다. 따라서 링크 정보들을 바탕으로 링크를 파싱할 수 있다.
+
+
+
+보통 `self` 링크는 해당 이벤트 리소스 마다 매번 설정해줘야하니깐 self 링크 추가하는 기능을 EventResource에서 하도록 리팩토링
 
 
 
