@@ -8,14 +8,25 @@ EvnetResource 만들기
 
 테스트 할 것
 
-> * 응답에 HATEOA와 profile 관련 링크가 있는지 확인.
+> * 응답에 HATEOAS와 profile 관련 링크가 있는지 확인.
 >   * self (view)
 >   * update (만든 사람은 수정할 수 있으니까)
 >   * events (목록으로 가는 링크)
 
 ---
 
-## 테스트 추가
+## 테스트
+
+확인사항
+
+- [x] self (view)
+
+* [x] update (만든 사람은 수정할 수 있으니까)
+* [x] events (목록으로 가는 링크)
+
+- [ ] ~~profile 관련 링크~~(나중에 추가)
+
+
 
 * 응답본문에 3가지 링크 정보가 들어가 있는지 확인
 
@@ -139,6 +150,27 @@ public class EventResource extends EntityModel<Event> {
 
 
 보통 `self` 링크는 해당 이벤트 리소스 마다 매번 설정해줘야하니깐 self 링크 추가하는 기능을 EventResource에서 하도록 리팩토링
+
+```java
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
+public class EventResource extends EntityModel<Event> {
+
+    public EventResource(Event event, Link ... links) {
+        super(event, links);
+        add(linkTo(EventController.class).slash(event.getId()).withSelfRel());
+    }
+}
+```
+
+
+
+※ 동일한 로직이지만 Type Safe하게 작성하도록 하자
+
+```java
+add(new Link("http://localhost:8080/api/events/" + event.getId())); //변경에 용이하지 않음
+add(linkTo(EventController.class).slash(event.getId()).withSelfRel()); //TypeSafe
+```
 
 
 
