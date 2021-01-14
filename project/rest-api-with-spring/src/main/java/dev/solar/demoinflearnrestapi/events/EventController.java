@@ -1,5 +1,6 @@
 package dev.solar.demoinflearnrestapi.events;
 
+import dev.solar.demoinflearnrestapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
@@ -35,12 +36,12 @@ public class EventController {
     @PostMapping()
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
         }
 
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
@@ -51,7 +52,7 @@ public class EventController {
         EventResource eventResource = new EventResource(newEvent);
         eventResource.add(linkTo(EventController.class).withRel("query-events")); //링크 추가 - 이벤트 조회
         eventResource.add(selfLinkBuilder.withRel("update-event")); //이벤트 수정(rel) - url은 self와 동일
-        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile")); // profile 링크 추가
+        eventResource.add(Link.of("/docs/index.html#resources-events-create").withRel("profile")); // profile 링크 추가
         return ResponseEntity.created(createdUri).body(eventResource); //EventResource로 변환해서 전달
     }
 }
