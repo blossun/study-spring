@@ -75,7 +75,8 @@ public class EventControllerTests {
                     links(
                             linkWithRel("self").description("link to self"),
                             linkWithRel("query-events").description("link to query events"),
-                            linkWithRel("update-event").description("link to update an existing")
+                            linkWithRel("update-event").description("link to update an existing"),
+                            linkWithRel("profile").description("link to update an existing event")
                     ),
                     requestHeaders(
                             headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -91,7 +92,7 @@ public class EventControllerTests {
                             fieldWithPath("location").description("location of new event"),
                             fieldWithPath("basePrice").description("base price of new event"),
                             fieldWithPath("maxPrice").description("max price of new event"),
-                            fieldWithPath("limitOfEnrollment").description("limit of enrolmment")
+                            fieldWithPath("limitOfEnrollment").description("limit of enrollment")
                     ),
                     responseHeaders(
                             headerWithName(HttpHeaders.LOCATION).description("Location header"),
@@ -108,13 +109,14 @@ public class EventControllerTests {
                             fieldWithPath("location").description("location of new event"),
                             fieldWithPath("basePrice").description("base price of new event"),
                             fieldWithPath("maxPrice").description("max price of new event"),
-                            fieldWithPath("limitOfEnrollment").description("limit of enrolmment"),
+                            fieldWithPath("limitOfEnrollment").description("limit of enrollment"),
                             fieldWithPath("free").description("it tells if this event is free or not"),
                             fieldWithPath("offline").description("it tells if this event is offline event or not"),
                             fieldWithPath("eventStatus").description("event status"),
                             fieldWithPath("_links.self.href").description("link to self"),
                             fieldWithPath("_links.query-events.href").description("link to query event list"),
-                            fieldWithPath("_links.update-event.href").description("link to update existing event")
+                            fieldWithPath("_links.update-event.href").description("link to update existing event"),
+                            fieldWithPath("_links.profile.href").description("link to profile")
                     )
             ))
         ;

@@ -191,9 +191,25 @@ resource > directory : 원본데이터 위치. 디렉토리 하위의 모든 문
 
 # profile 링크 추가
 
+테스트 추가
 
+응답 본문을 확인할 수 있지만 문서를 만들면서도 확인하므로 굳이 추가하지 않음
 
+```java
+.andExpect(jsonPath("_links.profile").exists())
+```
 
+문서에서 확인
+
+```java
+.andDo(document("create-event",
+        links(
+                linkWithRel("self").description("link to self"),
+                linkWithRel("query-events").description("link to query events"),
+                linkWithRel("update-event").description("link to update an existing"),
+                linkWithRel("profile").description("link to update an existing event") // 추가
+        ),
+```
 
 
 
