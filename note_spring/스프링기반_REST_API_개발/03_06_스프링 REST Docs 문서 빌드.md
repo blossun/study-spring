@@ -211,9 +211,19 @@ resource > directory : 원본데이터 위치. 디렉토리 하위의 모든 문
         ),
 ```
 
+profile 링크 추가
 
-
-
+```java
+public class EventController {
+   @PostMapping()
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+        EventResource eventResource = new EventResource(newEvent);
+        //...
+        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile")); // profile 링크 추가
+        return ResponseEntity.created(createdUri).body(eventResource); //EventResource로 변환해서 전달
+    }
+}
+```
 
 
 
