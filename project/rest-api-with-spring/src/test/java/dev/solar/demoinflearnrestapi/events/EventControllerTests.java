@@ -2,8 +2,8 @@ package dev.solar.demoinflearnrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.solar.demoinflearnrestapi.common.TestDescription;
-import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -20,6 +21,9 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,10 +42,16 @@ public class EventControllerTests {
     @Autowired
     private WebApplicationContext ctx;
 
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
+                .apply(documentationConfiguration(this.restDocumentation).operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
                 .alwaysDo(print())
                 .build();
     }
@@ -77,6 +87,7 @@ public class EventControllerTests {
             .andExpect(jsonPath("_links.self").exists())
             .andExpect(jsonPath("_links.query-events").exists())
             .andExpect(jsonPath("_links.update-event").exists())
+            .andDo(document("create-event"))
         ;
     }
 
