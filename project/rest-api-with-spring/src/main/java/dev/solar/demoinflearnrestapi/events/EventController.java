@@ -36,12 +36,12 @@ public class EventController {
     @PostMapping()
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
+            return badRequest(errors);
         }
 
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
+            return badRequest(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
@@ -54,5 +54,9 @@ public class EventController {
         eventResource.add(selfLinkBuilder.withRel("update-event")); //이벤트 수정(rel) - url은 self와 동일
         eventResource.add(Link.of("/docs/index.html#resources-events-create").withRel("profile")); // profile 링크 추가
         return ResponseEntity.created(createdUri).body(eventResource); //EventResource로 변환해서 전달
+    }
+
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
     }
 }
