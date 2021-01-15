@@ -2,7 +2,9 @@ package dev.solar.demoinflearnrestapi.events;
 
 import dev.solar.demoinflearnrestapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -59,8 +61,10 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable) {
-        return ResponseEntity.ok(this.eventRepository.findAll(pageable));
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+        Page<Event> page = this.eventRepository.findAll(pageable);
+        var pagedModel = assembler.toModel(page);
+        return ResponseEntity.ok(pagedModel);
     }
 
     private ResponseEntity badRequest(Errors errors) {
