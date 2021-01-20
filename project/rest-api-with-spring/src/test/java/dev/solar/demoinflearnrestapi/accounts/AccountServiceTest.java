@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,10 +48,15 @@ public class AccountServiceTest {
         assertThat(userDetails.getPassword()).isEqualTo(password);
     }
 
-    @Test(expected = UsernameNotFoundException.class)
+    @Test
     @Description("존재하지않는 username인 경우 UsernameNotFoundException 예외가 발생")
     public void findByUsernameFail() {
         String username = "random@email.com";
-        accountService.loadUserByUsername(username);
+        try {
+            accountService.loadUserByUsername(username);
+            fail("supposed to be failed"); //예외가 발생하지 않고 여기로 온다면 테스트 실패임을 명시적으로 알려줌
+        } catch (UsernameNotFoundException e) {
+            assertThat(e.getMessage()).containsSequence(username);
+        }
     }
 }
