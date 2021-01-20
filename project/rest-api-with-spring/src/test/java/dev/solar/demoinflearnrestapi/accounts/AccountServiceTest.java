@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -44,6 +45,12 @@ public class AccountServiceTest {
 
         // Then
         assertThat(userDetails.getPassword()).isEqualTo(password);
+    }
 
+    @Test(expected = UsernameNotFoundException.class)
+    @Description("존재하지않는 username인 경우 UsernameNotFoundException 예외가 발생")
+    public void findByUsernameFail() {
+        String username = "random@email.com";
+        accountService.loadUserByUsername(username);
     }
 }
