@@ -19,14 +19,12 @@ import java.util.regex.Matcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.assertThrows;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class AccountServiceTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Autowired
     AccountService accountService;
@@ -58,12 +56,10 @@ public class AccountServiceTest {
     @Test
     @Description("존재하지않는 username인 경우 UsernameNotFoundException 예외가 발생")
     public void findByUsernameFail() {
-        // Expected
+        // Given
         String username = "random@email.com";
-        expectedException.expect(UsernameNotFoundException.class);
-        expectedException.expectMessage(Matchers.containsString(username));
 
         // When
-        accountService.loadUserByUsername(username);
+        assertThrows(UsernameNotFoundException.class, () -> accountService.loadUserByUsername(username));
     }
 }
