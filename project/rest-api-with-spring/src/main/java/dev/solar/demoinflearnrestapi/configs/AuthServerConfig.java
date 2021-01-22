@@ -1,6 +1,7 @@
 package dev.solar.demoinflearnrestapi.configs;
 
 import dev.solar.demoinflearnrestapi.accounts.AccountService;
+import dev.solar.demoinflearnrestapi.common.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +33,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     TokenStore tokenStore;
 
+    @Autowired
+    AppProperties appProperties;
+
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.passwordEncoder(passwordEncoder);  //client_secret를 확인할 때 사용 client_secret도 전부 Password를 Encoding해서 관리
@@ -40,10 +44,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory() // 학습을 위해 inMemory 용으로 생성함. DB로 관리하는 것이 이상적
-                .withClient("myApp") // myApp에 대한 클라이언트를 하나 생성
+                .withClient(appProperties.getClientId()) // myApp에 대한 클라이언트를 하나 생성
                 .authorizedGrantTypes("password", "refresh_token") // 지원하는 grant_Type
                 .scopes("read", "write") // 앱에서 정의하는 값에 따라
-                .secret(this.passwordEncoder.encode("pass"))
+                .secret(this.passwordEncoder.encode(appProperties.getClientSecret()))
                 .accessTokenValiditySeconds(10 * 60) // 엑세스 토큰의 유효시간(초)
                 .refreshTokenValiditySeconds(6 * 10 * 60); // refresh_token의 유효시간(초)
     }

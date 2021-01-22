@@ -1,14 +1,11 @@
 package dev.solar.demoinflearnrestapi.configs;
 
-import dev.solar.demoinflearnrestapi.accounts.Account;
-import dev.solar.demoinflearnrestapi.accounts.AccountRole;
 import dev.solar.demoinflearnrestapi.accounts.AccountService;
+import dev.solar.demoinflearnrestapi.common.AppProperties;
 import dev.solar.demoinflearnrestapi.common.BaseControllerTest;
 import dev.solar.demoinflearnrestapi.common.TestDescription;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,27 +18,18 @@ public class AuthServerConfigTest extends BaseControllerTest {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    AppProperties appProperties;
+
     @Test
     @TestDescription("인증 토큰을 발급 받는 테스트")
     public void getAuthToken() throws Exception {
-        // Given
-        String username = "tester@email.com";
-        String password = "1234";
-        Account keesun = Account.builder()
-                .email(username)
-                .password(password)
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-        this.accountService.saveAccount(keesun);
-
-        String clientId = "myApp";
-        String clientSecret = "pass";
 
         // When & Then
         this.mockMvc.perform(post("/oauth/token")
-                    .with(httpBasic(clientId, clientSecret))
-                    .param("username", username)
-                    .param("password", password)
+                    .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                    .param("username", appProperties.getUserUsername())
+                    .param("password", appProperties.getUserpassword())
                     .param("grant_type", "password"))
                 .andDo(print())
                 .andExpect(status().isOk())

@@ -4,6 +4,7 @@ import dev.solar.demoinflearnrestapi.accounts.Account;
 import dev.solar.demoinflearnrestapi.accounts.AccountRepository;
 import dev.solar.demoinflearnrestapi.accounts.AccountRole;
 import dev.solar.demoinflearnrestapi.accounts.AccountService;
+import dev.solar.demoinflearnrestapi.common.AppProperties;
 import dev.solar.demoinflearnrestapi.common.BaseControllerTest;
 import dev.solar.demoinflearnrestapi.common.TestDescription;
 import org.junit.Before;
@@ -39,6 +40,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AppProperties appProperties;
 
     @Before
     public void setUp() {
@@ -131,11 +135,11 @@ public class EventControllerTests extends BaseControllerTest {
 
     private String getBearerToken() throws Exception {
         // Given
-        String username = "tester@email.com";
-        String password = "1234";
+        // DB와의 의존성을 끊어주기 위해서 setUp()에 모든 DB 정보를 지우는 코드를 추가했기 때문에
+        // 기본 생성되는 유저가 없다. 따라서 여기서는 유저를 만들어주도록(save) 한다.
         Account solar = Account.builder()
-                .email(username)
-                .password(password)
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserpassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
         this.accountService.saveAccount(solar);
@@ -145,8 +149,8 @@ public class EventControllerTests extends BaseControllerTest {
 
         ResultActions perform = this.mockMvc.perform(post("/oauth/token")
                 .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserpassword())
                 .param("grant_type", "password"));
 
         var responseBody = perform.andReturn().getResponse().getContentAsString();
