@@ -1,5 +1,6 @@
 package dev.solar.demoinflearnrestapi.events;
 
+import dev.solar.demoinflearnrestapi.accounts.AccountAdapter;
 import dev.solar.demoinflearnrestapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -63,11 +64,11 @@ public class EventController {
     @GetMapping
     public ResponseEntity queryEvents(Pageable pageable,
                                       PagedResourcesAssembler<Event> assembler,
-                                      @AuthenticationPrincipal User user) {
+                                      @AuthenticationPrincipal AccountAdapter currentUser) {
         Page<Event> page = this.eventRepository.findAll(pageable);
         var pagedModel = assembler.toModel(page, e -> new EventResource(e));
         pagedModel.add(Link.of("/docs/index.html#resources-events-list").withRel("profile"));
-        if (user != null) {
+        if (currentUser != null) {
             pagedModel.add(linkTo(EventController.class).withRel("create-event"));
         }
         return ResponseEntity.ok(pagedModel);
