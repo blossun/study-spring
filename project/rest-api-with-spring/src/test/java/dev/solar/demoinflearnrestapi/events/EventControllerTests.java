@@ -67,7 +67,7 @@ public class EventControllerTests extends BaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/events/") // 요청
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()) // 토큰을 가지고 요청
                 .contentType(MediaType.APPLICATION_JSON) // Request body 데이터 형태
                 .accept(MediaTypes.HAL_JSON) // Response 데이터 타입
                 .content(objectMapper.writeValueAsString(event))) // 헤더 정보에 맞게 본문을 JSON으로 변환해서 넘겨줘야한다.
@@ -134,6 +134,10 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getBearerToken() throws Exception {
+        return "Bearer" + getAccessToken();
+    }
+
+    private String getAccessToken() throws Exception {
         // Given
         // DB와의 의존성을 끊어주기 위해서 setUp()에 모든 DB 정보를 지우는 코드를 추가했기 때문에
         // 기본 생성되는 유저가 없다. 따라서 여기서는 유저를 만들어주도록(save) 한다.
@@ -179,7 +183,7 @@ public class EventControllerTests extends BaseControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/events/")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaTypes.HAL_JSON)
                 .content(objectMapper.writeValueAsString(event)))
@@ -195,7 +199,8 @@ public class EventControllerTests extends BaseControllerTest {
         EventDto eventDto = EventDto.builder().build();
 
         this.mockMvc.perform(post("/api/events")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                    .header(HttpHeaders.AUTHORIZATION, getBearerToken()
+)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
@@ -223,7 +228,8 @@ public class EventControllerTests extends BaseControllerTest {
                 .build();
 
         this.mockMvc.perform(post("/api/events")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()
+)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest())
@@ -238,7 +244,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
-    @TestDescription("30개의 이벤트를 10개의 두번쨰 페이지 조회하기")
+    @TestDescription("30개의 이벤트를 10개의 두번쨰 페이지 조회하기 - 인증정보 없는 경우")
     public void queryEvents() throws Exception {
         // Given
         IntStream.range(0, 30).forEach(i -> {
@@ -300,7 +306,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                        .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(eventDto))
                     )
@@ -319,7 +325,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                        .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
@@ -338,7 +344,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
@@ -354,7 +360,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/123123")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
