@@ -134,25 +134,23 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getBearerToken() throws Exception {
-        return "Bearer" + getAccessToken();
+        return "Bearer" + getAccessToken(true);
     }
 
-    private String getAccessToken() throws Exception {
+    private String getBearerToken(boolean needToCreateAccount) throws Exception {
+        return "Bearer" + getAccessToken(needToCreateAccount);
+    }
+
+    private String getAccessToken(boolean needToCreateAccount) throws Exception {
         // Given
         // DB와의 의존성을 끊어주기 위해서 setUp()에 모든 DB 정보를 지우는 코드를 추가했기 때문에
         // 기본 생성되는 유저가 없다. 따라서 여기서는 유저를 만들어주도록(save) 한다.
-        Account solar = Account.builder()
-                .email(appProperties.getUserUsername())
-                .password(appProperties.getUserpassword())
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-        this.accountService.saveAccount(solar);
-
-        String clientId = "myApp";
-        String clientSecret = "pass";
+        if (needToCreateAccount) {
+            createAccount();
+        }
 
         ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
                 .param("username", appProperties.getUserUsername())
                 .param("password", appProperties.getUserpassword())
                 .param("grant_type", "password"));
@@ -160,6 +158,15 @@ public class EventControllerTests extends BaseControllerTest {
         var responseBody = perform.andReturn().getResponse().getContentAsString();
         Jackson2JsonParser parser = new Jackson2JsonParser();
         return parser.parseMap(responseBody).get("access_token").toString();
+    }
+
+    private Account createAccount() {
+        Account solar = Account.builder()
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserpassword())
+                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .build();
+        return this.accountService.saveAccount(solar);
     }
 
     @Test
@@ -205,7 +212,6 @@ public class EventControllerTests extends BaseControllerTest {
                     .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
     }
-
 
     /*
      비즈니스 로직 상 잘못된 데이터 입력 시 Bad Request
@@ -296,7 +302,8 @@ public class EventControllerTests extends BaseControllerTest {
     @TestDescription("기존의 이벤트를 하나 조회하기")
     public void getEvent() throws Exception {
         // Given
-        Event event = this.generateEvent(100);
+        Account account = this.createAccount();
+        Event event = this.generateEvent(100, account);
 
         // When & Then
         this.mockMvc.perform(get("/api/events/{id}", event.getId()))
@@ -322,14 +329,15 @@ public class EventControllerTests extends BaseControllerTest {
     @TestDescription("이벤트를 정상적으로 수정하기")
     public void updateEvent() throws Exception {
         // Given
-        Event event = this.generateEvent(200);
+        Account account = this.createAccount();
+        Event event = this.generateEvent(200, account);
         EventDto eventDto = this.modelMapper.map(event, EventDto.class);
         String eventName = "Update Event";
         eventDto.setName(eventName);
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                        .header(HttpHeaders.AUTHORIZATION, getBearerToken())
+                        .header(HttpHeaders.AUTHORIZATION, getBearerToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(eventDto))
                     )
@@ -391,22 +399,31 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private Event generateEvent(int index) {
-        Event event = Event.builder()
-                .name("event" + index)
-                .description("test event")
-                .beginEnrollmentDateTime(LocalDateTime.of(2021, 1, 8, 13, 2, 21))
-                .closeEnrollmentDateTime(LocalDateTime.of(2021, 1, 9, 13, 2, 21))
-                .beginEventDateTime(LocalDateTime.of(2021, 1, 10, 13, 2, 21))
-                .endEventDateTime(LocalDateTime.of(2021, 1, 11, 13, 2, 21))
-                .basePrice(100)
-                .maxPrice(200)
-                .limitOfEnrollment(100)
-                .location("강남역 D2 스타텁 팩토리")
-                .free(false)
-                .offline(true)
-                .eventStatus(EventStatus.DRAFT)
-                .build();
-
+        Event event = buildEvent(index);
         return this.eventRepository.save(event);
+    }
+
+    private Event generateEvent(int index, Account account) {
+        Event event = buildEvent(index);
+        event.setManager(account);
+        return this.eventRepository.save(event);
+    }
+
+    private Event buildEvent(int index) {
+        return Event.builder()
+                    .name("event" + index)
+                    .description("test event")
+                    .beginEnrollmentDateTime(LocalDateTime.of(2021, 1, 8, 13, 2, 21))
+                    .closeEnrollmentDateTime(LocalDateTime.of(2021, 1, 9, 13, 2, 21))
+                    .beginEventDateTime(LocalDateTime.of(2021, 1, 10, 13, 2, 21))
+                    .endEventDateTime(LocalDateTime.of(2021, 1, 11, 13, 2, 21))
+                    .basePrice(100)
+                    .maxPrice(200)
+                    .limitOfEnrollment(100)
+                    .location("강남역 D2 스타텁 팩토리")
+                    .free(false)
+                    .offline(true)
+                    .eventStatus(EventStatus.DRAFT)
+                    .build();
     }
 }
