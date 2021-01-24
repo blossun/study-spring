@@ -1,5 +1,6 @@
 package dev.solar.demoinflearnrestapi.events;
 
+import dev.solar.demoinflearnrestapi.accounts.Account;
 import dev.solar.demoinflearnrestapi.accounts.AccountAdapter;
 import dev.solar.demoinflearnrestapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
@@ -64,11 +65,11 @@ public class EventController {
     @GetMapping
     public ResponseEntity queryEvents(Pageable pageable,
                                       PagedResourcesAssembler<Event> assembler,
-                                      @AuthenticationPrincipal AccountAdapter currentUser) {
+                                      @AuthenticationPrincipal(expression = "account") Account account) {
         Page<Event> page = this.eventRepository.findAll(pageable);
         var pagedModel = assembler.toModel(page, e -> new EventResource(e));
         pagedModel.add(Link.of("/docs/index.html#resources-events-list").withRel("profile"));
-        if (currentUser != null) {
+        if (account != null) {
             pagedModel.add(linkTo(EventController.class).withRel("create-event"));
         }
         return ResponseEntity.ok(pagedModel);
